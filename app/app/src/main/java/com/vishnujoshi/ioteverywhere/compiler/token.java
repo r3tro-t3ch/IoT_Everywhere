@@ -1,3 +1,5 @@
+package com.vishnujoshi.ioteverywhere.compiler;
+
 class token{
 	
 	private String type;
