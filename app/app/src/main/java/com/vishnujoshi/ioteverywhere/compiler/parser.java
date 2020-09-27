@@ -1,5 +1,7 @@
 package com.vishnujoshi.ioteverywhere.compiler;
 
+import android.content.Context;
+
 class parser{
 
 	private token current_token;
@@ -376,7 +378,6 @@ class parser{
 
 			this.get_next_token();
 
-			node.set_type("AST_VAR_DEF_ASSIGNMENT");
 
 			if( !this.eat(this.get_current_token(), "T_EQUAL", err_list, list.get_ast_list_count()) ){
 				error_flag = true;
@@ -389,7 +390,8 @@ class parser{
 				
 				this.get_next_token();
 
-			
+				node.set_type("AST_VAR_DEF_ASSIGNMENT_CONSTANT");
+
 				if( !this.eat(this.get_current_token(), "T_CONSTANT", err_list, list.get_ast_list_count())){
 				
 					error_flag = true;
@@ -409,13 +411,32 @@ class parser{
 
 				this.get_next_token();
 
-				if( !this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())){
-					error_flag = true;
-					return null;
+				t = peek_next_token();
+
+				if(t.get_type().equals("T_LPAREN")){
+
+					ast temp_node = this.parse_function_call(err_list, list);
+
+					node.set_type("AST_VAR_DEF_ASSIGNMENT_FUNCTION");
+
+					node.set_function_name(temp_node.get_function_name());
+					node.set_args_list(temp_node.get_args_list());
+					node.setFunction_return_value(temp_node.getFunction_return_value());
+
+					node.set_var_def_var_content(temp_node.getFunction_return_value());
+
+				}else {
+
+					if (!this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
+						error_flag = true;
+						return null;
+					}
+
+					node.set_type("AST_VAR_DEF_ASSIGNMENT_IDENTIFIER");
+
+					node.set_var_def_var_content(get_current_token().get_content());
+
 				}
-
-				node.set_var_def_var_content(get_current_token().get_content());
-
 				node.set_ast_node_index(list.get_ast_list_count());
 
 				if(!error_flag){
@@ -423,6 +444,8 @@ class parser{
 				}
 			
 			}
+
+			//TODO(implement AST_VAR_DEF_ASSIGNMENT_FUNCTION)
 
 		}else{
 
@@ -646,7 +669,7 @@ class parser{
 
 			}
 
-		}//implement user defined function call
+		}// TODO(implement user defined function call)
 
 		node.set_ast_node_index(list.get_ast_list_count());
 
@@ -692,6 +715,8 @@ class parser{
 
 			this.get_next_token();
 
+			node.set_type("AST_VAR_ASSIGNMENT_CONSTANT");
+
 			if( !this.eat( get_current_token(), "T_CONSTANT", err_list, list.get_ast_list_count() ) ){
 
 				error_flag = true;
@@ -699,20 +724,45 @@ class parser{
 
 			}
 
+			node.set_var_content( this.get_current_token().get_content() );
+
 			node.set_ast_node_index( list.get_ast_list_count() );
 
 		}else if( t.get_type().equals("T_IDENTIFIER") ){
 
 			this.get_next_token();
 
-			if( !this.eat( get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count() ) ){
+			t = peek_next_token();
 
-				error_flag = true;
-				return null;
+			if(t.get_type().equals("T_LPAREN")){
+
+				ast temp_node = this.parse_function_call(err_list, list);
+
+				node.set_type("AST_VAR_ASSIGNMENT_FUNCTION");
+
+				node.set_function_name(temp_node.get_function_name());
+				node.set_args_list(temp_node.get_args_list());
+				node.setFunction_return_value(temp_node.getFunction_return_value());
+
+				node.set_var_content(node.getFunction_return_value());
+
+			}else {
+
+				if (!this.eat(get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
+
+					error_flag = true;
+					return null;
+
+				}
+
+				node.set_type("AST_VAR_ASSIGNMENT_IDENTIFIER");
+
+				node.set_var_content(this.get_current_token().get_content());
 
 			}
 
-			node.set_ast_node_index( list.get_ast_list_count() );
+			node.set_ast_node_index(list.get_ast_list_count());
+
 
 		}else{
 			this.parse_newline(err_list, list);

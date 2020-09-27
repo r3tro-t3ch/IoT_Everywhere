@@ -37,6 +37,7 @@ class keywords{
 		"output",
 		"input",
 		"wait",
+		"print",
 	};
 
 	private static ArrayList<String> BUILTIN_FUNCTION_LIST = new ArrayList<String>(Arrays.asList(BUILTIN_FUNCTION));

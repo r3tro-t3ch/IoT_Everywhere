@@ -12,7 +12,7 @@ class ast{
 	//funciton call
 	private String function_name;
 	private ArrayList<function_arg> args_list;
-
+	private String function_return_value;
 
 	//variable definition and assignment
 	private String var_def_var_name;
@@ -63,8 +63,20 @@ class ast{
 		return this.args_list;
 	}
 
+	public void set_args_list(ArrayList<function_arg> args_list) {
+		this.args_list = args_list;
+	}
+
 	public void add_function_arg(function_arg arg){
 		this.args_list.add(arg);
+	}
+
+	public String getFunction_return_value() {
+		return function_return_value;
+	}
+
+	public void setFunction_return_value(String function_return_value) {
+		this.function_return_value = function_return_value;
 	}
 
 	//function call args count
@@ -113,6 +125,10 @@ class ast{
 class ast_l{
 
 	private ArrayList<ast> ast_list;
+
+	public ArrayList<ast> getAst_list() {
+		return ast_list;
+	}
 
 	//constructor
 	public ast_l(){

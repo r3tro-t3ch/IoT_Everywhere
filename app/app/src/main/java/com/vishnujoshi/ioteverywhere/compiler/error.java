@@ -1,6 +1,15 @@
 package com.vishnujoshi.ioteverywhere.compiler;
 
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
+import android.text.Layout;
+import android.view.LayoutInflater;
+import android.widget.TextView;
+
+
 import java.util.*;
+
 
 class error{
 
@@ -27,6 +36,7 @@ class error{
 
 class errors{
 
+	private Context context;
 	private ArrayList<error> error_list;
 
 	//constructor
@@ -45,7 +55,7 @@ class errors{
 
 		for(error i : error_list){
 
-			System.out.println("ERROR : line " + i.get_line_number() + " -> " + i.get_error_msg());
+			System.out.println("ERROR : line " + i.get_line_number() + " -> " + i.get_error_msg() + "\n");
 
 		}
 
