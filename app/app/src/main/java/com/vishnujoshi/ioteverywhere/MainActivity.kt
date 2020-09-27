@@ -26,13 +26,10 @@ class MainActivity : AppCompatActivity(){
         val view = binding.root
         setContentView(view)
 
-        //console = outputScreen
-
         binding.run.setOnClickListener{
 
             val code = binding.codeEditor.text.trim().toString()
 
-            //Log.e(TAG,"${code}")
 
             //binding.outputScreen.visibility = View.VISIBLE
             val c = compiler(code + "\u0000")
