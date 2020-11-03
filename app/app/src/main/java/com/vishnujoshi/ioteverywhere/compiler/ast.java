@@ -17,10 +17,12 @@ class ast{
 	//variable definition and assignment
 	private String var_def_var_name;
 	private String var_def_var_content;
+	private ArrayList<token> var_def_var_expr;
 
 	//variable
 	private String var_name;
 	private String var_content;
+	private ArrayList<token> var_expr;
 
 	//constructor
 	public ast(String type){
@@ -119,7 +121,22 @@ class ast{
 	public void set_var_content(String content){
 		this.var_content = content;
 	}
-	
+
+	public ArrayList<token> getVar_def_var_expr() {
+		return var_def_var_expr;
+	}
+
+	public void setVar_def_var_expr(ArrayList<token> var_def_var_expr) {
+		this.var_def_var_expr = var_def_var_expr;
+	}
+
+	public ArrayList<token> getVar_expr() {
+		return var_expr;
+	}
+
+	public void setVar_expr(ArrayList<token> var_expr) {
+		this.var_expr = var_expr;
+	}
 }
 
 class ast_l{

@@ -6,6 +6,12 @@ public class symbol_table {
 
     private ArrayList<symbol> table;
 
+    public symbol_table(){
+
+        this.table = new ArrayList<>();
+
+    }
+
     public void add_new_symbol(symbol s){
         table.add(s);
     }
@@ -27,6 +33,27 @@ public class symbol_table {
         }
 
         return null;
+    }
+
+    public void update_table(symbol s){
+
+        symbol temp = this.search_symbol(s.getName());
+
+        if( temp != null){
+
+            for(symbol i : this.table){
+
+                if(s.getName().equals(i.getName())){
+
+                    s = i;
+                    break;
+
+                }
+
+            }
+
+        }
+
     }
 
 }

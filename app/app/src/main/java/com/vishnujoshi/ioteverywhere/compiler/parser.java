@@ -1,6 +1,9 @@
 package com.vishnujoshi.ioteverywhere.compiler;
 
 import android.content.Context;
+import android.util.Log;
+
+import java.util.ArrayList;
 
 class parser{
 
@@ -351,9 +354,36 @@ class parser{
 			
 	}
 
+	public ArrayList<token> parse_expression(){
+
+		this.get_next_token();
+
+		expression e = new expression();
+
+		ArrayList<token> list = new ArrayList<>();
+
+		while ( e.is_expression_token(this.get_current_token())){
+
+			list.add(this.get_current_token());
+			this.get_next_token();
+
+		}
+
+		if( list.size() == 1){
+			return list;
+		}
+
+		return e.infix_to_postfix(list);
+
+	}
+
 	public ast parse_var_def(errors err_list, ast_l list){
 
 		ast node = new ast("AST_VAR_DEF");
+
+		keywords k = new keywords();
+
+		expression e = new expression();
 
 		boolean error_flag = false;
 
@@ -378,7 +408,6 @@ class parser{
 
 			this.get_next_token();
 
-
 			if( !this.eat(this.get_current_token(), "T_EQUAL", err_list, list.get_ast_list_count()) ){
 				error_flag = true;
 				return null;
@@ -386,66 +415,47 @@ class parser{
 
 			t = this.peek_next_token();
 
-			if(t.get_type().equals("T_CONSTANT")){
-				
-				this.get_next_token();
+			if( t.get_type().equals("T_CONSTANT") ||
+				t.get_type().equals("T_IDENTIFIER") ||
+				t.get_type().equals("T_STRING")){
 
-				node.set_type("AST_VAR_DEF_ASSIGNMENT_CONSTANT");
 
-				if( !this.eat(this.get_current_token(), "T_CONSTANT", err_list, list.get_ast_list_count())){
-				
-					error_flag = true;
-					return null;
-			
-				}
+				if( t.get_type().equals("T_IDENTIFIER")){
 
-				node.set_var_def_var_content(get_current_token().get_content());
+					if( k.is_builtin_function(t.get_content())){
 
-				node.set_ast_node_index(list.get_ast_list_count());
+						this.get_next_token();
 
-				if(!error_flag){
-					return node;
-				}
+						ast temp = this.parse_function_call(err_list, list);
 
-			}else if(t.get_type().equals("T_IDENTIFIER")){
+						node.set_type("AST_VAR_DEF_ASSIGNMENT_FUNCTION");
+						node.set_function_name(temp.get_function_name());
+						node.set_args_list(temp.get_args_list());
 
-				this.get_next_token();
+						node.set_ast_node_index(list.get_ast_list_count());
 
-				t = peek_next_token();
+						return node;
 
-				if(t.get_type().equals("T_LPAREN")){
-
-					ast temp_node = this.parse_function_call(err_list, list);
-
-					node.set_type("AST_VAR_DEF_ASSIGNMENT_FUNCTION");
-
-					node.set_function_name(temp_node.get_function_name());
-					node.set_args_list(temp_node.get_args_list());
-					node.setFunction_return_value(temp_node.getFunction_return_value());
-
-					node.set_var_def_var_content(temp_node.getFunction_return_value());
-
-				}else {
-
-					if (!this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
-						error_flag = true;
-						return null;
 					}
 
-					node.set_type("AST_VAR_DEF_ASSIGNMENT_IDENTIFIER");
+				}
 
-					node.set_var_def_var_content(get_current_token().get_content());
+				node.setVar_def_var_expr(this.parse_expression());
+
+				if( e.is_postfix_valid(node.getVar_def_var_expr()) ){
+
+					err_list.add_new_error(new error("Invalid expression", list.get_ast_list_count()));
+					return null;
 
 				}
+
+				node.set_type("AST_VAR_DEF_ASSIGNMENT");
+
 				node.set_ast_node_index(list.get_ast_list_count());
 
-				if(!error_flag){
-					return node;
-				}
-			
-			}
+				return node;
 
-			//TODO(implement AST_VAR_DEF_ASSIGNMENT_FUNCTION)
+			}
 
 		}else{
 
@@ -484,7 +494,6 @@ class parser{
 			return null;
 
 		}
-
 
 		if( k.is_builtin_function(this.get_current_token().get_content()) ){
 
@@ -609,7 +618,6 @@ class parser{
 
 				node.add_function_arg(arg);
 
-				
 			}else if( get_current_token().get_content().equals("wait")){
 
 				node.set_function_name(get_current_token().get_content());
@@ -687,9 +695,11 @@ class parser{
 
 		ast node = new ast("AST_VAR_ASSIGNMENT");
 
-		System.out.println("here");
-
 		boolean error_flag = false;
+
+		keywords k = new keywords();
+
+		expression e = new expression();
 
 		if( !this.eat(get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count()) ){
 
@@ -711,71 +721,55 @@ class parser{
 
 		token t = peek_next_token();
 
-		if( t.get_type().equals("T_CONSTANT") ){
+		if( t.get_type().equals("T_CONSTANT") ||
+			t.get_type().equals("T_STRING") ||
+			t.get_type().equals("T_IDENTIFIER") ){
 
-			this.get_next_token();
 
-			node.set_type("AST_VAR_ASSIGNMENT_CONSTANT");
+			if( t.get_type().equals("T_IDENTIFIER")){
 
-			if( !this.eat( get_current_token(), "T_CONSTANT", err_list, list.get_ast_list_count() ) ){
+				if( k.is_builtin_function(t.get_content())){
+
+					this.get_next_token();
+
+					ast temp = parse_function_call(err_list, list);
+
+					node.set_type("AST_VAR_ASSIGNMENT_FUNCTION");
+
+					node.set_function_name(temp.get_function_name());
+					node.set_args_list(temp.get_args_list());
+
+					node.set_ast_node_index(list.get_ast_list_count());
+
+					return node;
+				}
+
+			}
+
+
+			node.set_type("AST_VAR_ASSIGNMENT");
+
+			node.setVar_expr( this.parse_expression() );
+
+			if( e.is_postfix_valid(node.getVar_expr()) ){
+
+				err_list.add_new_error(new error("Invalid expression", list.get_ast_list_count()));
 
 				error_flag = true;
+
 				return null;
 
 			}
 
-			node.set_var_content( this.get_current_token().get_content() );
-
 			node.set_ast_node_index( list.get_ast_list_count() );
 
-		}else if( t.get_type().equals("T_IDENTIFIER") ){
-
-			this.get_next_token();
-
-			t = peek_next_token();
-
-			if(t.get_type().equals("T_LPAREN")){
-
-				ast temp_node = this.parse_function_call(err_list, list);
-
-				node.set_type("AST_VAR_ASSIGNMENT_FUNCTION");
-
-				node.set_function_name(temp_node.get_function_name());
-				node.set_args_list(temp_node.get_args_list());
-				node.setFunction_return_value(temp_node.getFunction_return_value());
-
-				node.set_var_content(node.getFunction_return_value());
-
-			}else {
-
-				if (!this.eat(get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
-
-					error_flag = true;
-					return null;
-
-				}
-
-				node.set_type("AST_VAR_ASSIGNMENT_IDENTIFIER");
-
-				node.set_var_content(this.get_current_token().get_content());
-
-			}
-
-			node.set_ast_node_index(list.get_ast_list_count());
-
-
-		}else{
-			this.parse_newline(err_list, list);
 		}
 
-		if( error_flag == false ){
-
+		if( !error_flag ) {
 			return node;
-
 		}
 
 		return null;
-
 	}
 
 	public ast_l parse_statements(){

@@ -36,7 +36,6 @@ public class compiler {
 
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.M)
 	public void compile(){
 
 		this.ast_list = new ast_l();
@@ -52,7 +51,6 @@ public class compiler {
 
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.M)
 	public void run(ast_l ast_list){
 
 		Log.e(TAG, "here");

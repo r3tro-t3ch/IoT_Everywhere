@@ -26,7 +26,7 @@ class keywords{
 		"SPEAKER",
 		"LIGHT",
 		"MIC",
-		"TEMPARATURE",
+		"TEMPERATURE",
 		"ACCELEROMETER",
 		"GYROSCOPE",
 		"AIR_PRESSURE",
