@@ -9,6 +9,7 @@ class parser{
 
 	private token current_token;
 	private lexer l;
+	private String TAG = this.getClass().getSimpleName();
 
 	//constructor
 	parser(lexer l){
@@ -419,7 +420,6 @@ class parser{
 				t.get_type().equals("T_IDENTIFIER") ||
 				t.get_type().equals("T_STRING")){
 
-
 				if( t.get_type().equals("T_IDENTIFIER")){
 
 					if( k.is_builtin_function(t.get_content())){
@@ -428,13 +428,20 @@ class parser{
 
 						ast temp = this.parse_function_call(err_list, list);
 
-						node.set_type("AST_VAR_DEF_ASSIGNMENT_FUNCTION");
-						node.set_function_name(temp.get_function_name());
-						node.set_args_list(temp.get_args_list());
+						if(temp != null) {
 
-						node.set_ast_node_index(list.get_ast_list_count());
+							node.set_type("AST_VAR_DEF_ASSIGNMENT_FUNCTION");
+							node.set_function_name(temp.get_function_name());
+							node.set_args_list(temp.get_args_list());
 
-						return node;
+							node.set_ast_node_index(list.get_ast_list_count());
+
+							return node;
+						}else{
+
+							return null;
+
+						}
 
 					}
 
@@ -681,7 +688,7 @@ class parser{
 
 		node.set_ast_node_index(list.get_ast_list_count());
 
-		if( error_flag == false ){
+		if( !error_flag ){
 
 			return node;
 
@@ -734,14 +741,19 @@ class parser{
 
 					ast temp = parse_function_call(err_list, list);
 
-					node.set_type("AST_VAR_ASSIGNMENT_FUNCTION");
+					if (temp != null) {
+						node.set_type("AST_VAR_ASSIGNMENT_FUNCTION");
 
-					node.set_function_name(temp.get_function_name());
-					node.set_args_list(temp.get_args_list());
+						node.set_function_name(temp.get_function_name());
+						node.set_args_list(temp.get_args_list());
 
-					node.set_ast_node_index(list.get_ast_list_count());
+						node.set_ast_node_index(list.get_ast_list_count());
 
-					return node;
+						return node;
+					}else{
+						return null;
+					}
+
 				}
 
 			}

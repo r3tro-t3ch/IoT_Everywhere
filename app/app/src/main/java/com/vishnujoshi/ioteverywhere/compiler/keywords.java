@@ -27,9 +27,13 @@ class keywords{
 		"LIGHT",
 		"MIC",
 		"TEMPERATURE",
-		"ACCELEROMETER",
-		"GYROSCOPE",
-		"AIR_PRESSURE",
+		"ACCELEROMETERX",
+		"ACCELEROMETERY",
+		"ACCELEROMETERZ",
+		"GYROSCOPEX",
+		"GYROSCOPEY",
+		"GYROSCOPEZ",
+		"AIRPRESSURE",
 		"HUMIDITY",
 		};
 
@@ -46,7 +50,7 @@ class keywords{
 
 	private boolean search_keyword(String identifier){
 	
-		for(int i = 0; i < 24; i++){
+		for(int i = 0; i < KEYWORD_LIST.size(); i++){
 			
 			if(KEYWORDS[i].equals(identifier)){
 				return true;	

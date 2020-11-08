@@ -188,7 +188,7 @@ public class evaluator {
 
             }else if( temp_ast.get_type().equals("AST_VAR_ASSIGNMENT_FUNCTION")){
 
-                symbol s = table.search_symbol(temp_ast.get_var_def_var_name());
+                symbol s = table.search_symbol(temp_ast.get_var_name());
 
                 if(s != null){
 
@@ -343,6 +343,54 @@ public class evaluator {
             } else if (arg1.get_arg_name().equals("TEMPERATURE")) {
 
                 String val = SENSOR_DATA.getString("TEMPERATURE", "");
+
+                return val;
+
+            } else if(arg1.get_arg_name().equals("GYROSCOPEX")){
+
+                String val = SENSOR_DATA.getString("GYROSCOPEX", "");
+
+                return val;
+
+            }else if(arg1.get_arg_name().equals("GYROSCOPEY")){
+
+                String val = SENSOR_DATA.getString("GYROSCOPEY", "");
+
+                return val;
+
+            }else if(arg1.get_arg_name().equals("GYROSCOPEZ")){
+
+                String val = SENSOR_DATA.getString("GYROSCOPEZ", "");
+
+                return val;
+
+            }else if (arg1.get_arg_name().equals("ACCELEROMETERX")){
+
+                String val = SENSOR_DATA.getString("ACCELEROMETERX", "");
+
+                return val;
+
+            }else if (arg1.get_arg_name().equals("ACCELEROMETERY")){
+
+                String val = SENSOR_DATA.getString("ACCELEROMETERY", "");
+
+                return val;
+
+            }else if (arg1.get_arg_name().equals("ACCELEROMETERZ")){
+
+                String val = SENSOR_DATA.getString("ACCELEROMETERZ", "");
+
+                return val;
+
+            }else  if(arg1.get_arg_name().equals("HUMIDITY")){
+
+                String val = SENSOR_DATA.getString("HUMIDITY","");
+
+                return val;
+
+            }else if(arg1.get_arg_name().equals("AIRPRESSURE")){
+
+                String val = SENSOR_DATA.getString("AIRPRESSURE", "");
 
                 return val;
 
