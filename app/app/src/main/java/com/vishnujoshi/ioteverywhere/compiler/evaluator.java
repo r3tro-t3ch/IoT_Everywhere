@@ -52,172 +52,641 @@ public class evaluator {
         errors err_list = new errors();
         symbol_table table = new symbol_table();
         symbol temp_s = new symbol();
+
         SENSOR_DATA = context.getSharedPreferences("SENSOR_DATA", context.MODE_PRIVATE);
 
         for(ast temp_ast : ast_list.getAst_list()){
 
-            if(temp_ast.get_type().equals("AST_BUILTIN_FUNCTION_CALL")){
+            switch (temp_ast.get_type()) {
+                case "AST_BUILTIN_FUNCTION_CALL":
 
-                this.evaluate_function_call(k, temp_ast, err_list, table);
+                    this.evaluate_function_call(k, temp_ast, err_list, table, null);
 
-            }else if(temp_ast.get_type().equals("AST_VAR_DEF")){
+                    break;
+                case "AST_VAR_DEF":
 
-                temp_s = table.search_symbol(temp_ast.get_var_def_var_name());
+                    temp_s = table.search_symbol(temp_ast.get_var_def_var_name());
 
-                if(temp_s == null) {
+                    if (temp_s == null) {
 
-                    table.add_new_symbol(new symbol(temp_ast.get_var_def_var_name(),
-                            "NA",
-                            "NA"));
+                        table.add_new_symbol(new symbol(temp_ast.get_var_def_var_name(),
+                                "NA",
+                                "NA"));
 
-                }else{
+                    } else {
 
-                    err_list.add_new_error(new error("symbol " + temp_ast.get_var_def_var_name() + " already present", temp_ast.get_ast_node_index()));
+                        err_list.add_new_error(new error("symbol " + temp_ast.get_var_def_var_name() + " already present", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+                    }
+
+                    break;
+                case "AST_VAR_DEF_ASSIGNMENT": {
+
+                    expression e = new expression();
+
+                    symbol t_s = table.search_symbol(temp_ast.get_var_def_var_name());
+
+                    if (t_s == null) {
+
+                        ArrayList<token> list = temp_ast.getVar_def_var_expr();
+
+                        String answer = e.evaluate_expression(list, err_list, table, temp_ast.get_ast_node_index());
+
+                        symbol s;
+
+                        if (answer != null) {
+
+                            Log.e("answer", ": " + answer);
+
+                            if (!e.getSTRING_FLAG()) {
+
+                                s = new symbol(temp_ast.get_var_def_var_name(), answer, "T_IDENTIFIER");
+
+                            } else {
+
+                                s = new symbol(temp_ast.get_var_def_var_name(), answer, "T_STRING");
+
+                            }
+
+                            table.add_new_symbol(s);
+
+                        }
+
+                    } else {
+
+                        err_list.add_new_error(new error("variable " + temp_ast.get_var_def_var_name() + " is already declared", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+                    }
+
+                    break;
+                }
+                case "AST_VAR_DEF_ASSIGNMENT_FUNCTION": {
+
+                    symbol s = table.search_symbol(temp_ast.get_var_def_var_name());
+
+                    if (s == null) {
+
+                        s = new symbol(temp_ast.get_var_def_var_name(), "NA", "NA");
+
+                        String answer;
+
+                        if (temp_ast.get_function_name().equals("input")) {
+
+                            answer = this.evaluate_input_function_call(temp_ast, k, err_list);
+
+                            if (answer != null) {
+
+                                s.setValue(answer);
+
+                                s.setData_type("NUMBER");
+
+                                table.update_table(s);
+
+                                Log.e("sensor_val : ", s.getValue());
+
+                            }
+
+                        }
+
+                    } else {
+
+                        err_list.add_new_error(new error("variable " + temp_ast.get_var_def_var_name() + " is already declared", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+                    }
+
+                    break;
+                }
+                case "AST_VAR_ASSIGNMENT": {
+
+                    symbol s = table.search_symbol(temp_ast.get_var_name());
+
+                    expression e = new expression();
+
+                    if (s != null) {
+
+                        ArrayList<token> list = temp_ast.getVar_expr();
+
+                        String answer = e.evaluate_expression(list, err_list, table, temp_ast.get_ast_node_index());
+
+                        if (answer != null) {
+
+                            Log.e("answer", ": " + answer);
+
+                            if (!e.getSTRING_FLAG()) {
+
+                                s.setValue(answer);
+
+                                s.setData_type("NUMBER");
+
+                                table.update_table(s);
+
+                            } else {
+
+                                s.setValue(answer);
+
+                                s.setData_type("STRING");
+
+                                table.update_table(s);
+
+                            }
+
+                        }
+
+                    } else {
+
+                        err_list.add_new_error(new error("Variable " + temp_ast.get_var_name() + " is not declared", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+                    }
+
+                    break;
+                }
+                case "AST_VAR_ASSIGNMENT_FUNCTION": {
+
+                    symbol s = table.search_symbol(temp_ast.get_var_name());
+
+                    if (s != null) {
+
+                        String answer;
+
+                        if (temp_ast.get_function_name().equals("input")) {
+
+                            answer = this.evaluate_input_function_call(temp_ast, k, err_list);
+
+                            if (answer != null) {
+
+                                s.setValue(answer);
+
+                                s.setData_type("NUMBER");
+
+                                table.update_table(s);
+
+                                Log.e("sensor_val : ", s.getValue());
+
+                            }
+
+                        }
+
+                    } else {
+
+                        err_list.add_new_error(new error("Variable " + temp_ast.get_var_def_var_name() + " is not declared", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+                    }
+
+                    break;
+                }
+                case "AST_CONDITIONAL_IF" : {
+
+                    Log.e(TAG, "AST_if");
+                    Log.e(TAG,"True block");
+                    temp_ast.getTrue_block().print_ast();
+
+                    expression e = new expression();
+
+                    String answer = e.evaluate_logical_expression(temp_ast.getConditional_statement_expr() , err_list, table, temp_ast.get_ast_node_index());
+
+                    if( answer != null) {
+
+                        Log.e(TAG, answer);
+
+                        if (answer.equals("true")) {
+
+                            this.run_block(table, temp_ast.getTrue_block(), err_list);
+
+                        }
+
+                    }else{
+
+                        err_list.print_errors();
+
+                    }
+
+                    break;
+
+                }
+                case "AST_CONDITIONAL_IF_ELSE" : {
+
+                    Log.e(TAG, "AST_if_else");
+                    Log.e(TAG,"True block");
+                    temp_ast.getTrue_block().print_ast();
+                    Log.e(TAG,"False block");
+                    temp_ast.getFalse_block().print_ast();
+
+                    expression e = new expression();
+
+                    String answer = e.evaluate_logical_expression(temp_ast.getConditional_statement_expr(), err_list, table, temp_ast.get_ast_node_index());
+
+                    if(answer != null) {
+
+                        Log.e(TAG, answer);
+
+                        if (answer.equals("true")) {
+
+                            this.run_block(table, temp_ast.getTrue_block(), err_list);
+
+                        } else {
+
+                            this.run_block(table, temp_ast.getFalse_block(), err_list);
+
+                        }
+
+                    }else{
+
+                        err_list.print_errors();
+
+                    }
+
+                    break;
 
                 }
 
-            }else if(temp_ast.get_type().equals("AST_VAR_DEF_ASSIGNMENT")){
+            }
 
-                expression e = new expression();
+        }
 
-                symbol t_s = table.search_symbol(temp_ast.get_var_def_var_name());
+    }
 
-                if( t_s == null){
+    public void run_block( symbol_table parent_symbol_table, ast_l code_block, errors err_list){
 
-                    ArrayList<token> list = temp_ast.getVar_def_var_expr();
+        keywords k = new keywords();
+        symbol_table table = new symbol_table();
+        symbol temp_s;
+        symbol temp_s_parent = new symbol();
 
-                    String answer = e.evaluate_expression(list ,err_list, table, temp_ast.get_ast_node_index());
+        SENSOR_DATA = context.getSharedPreferences("SENSOR_DATA", context.MODE_PRIVATE);
+
+        for(ast temp_ast : code_block.getAst_list()){
+
+            switch (temp_ast.get_type()) {
+                case "AST_BUILTIN_FUNCTION_CALL":
+
+                    this.evaluate_function_call(k, temp_ast, err_list, table, parent_symbol_table);
+
+                    break;
+                case "AST_VAR_DEF": {
+
+                    temp_s_parent = parent_symbol_table.search_symbol(temp_ast.get_var_def_var_name());
+
+                    temp_s = table.search_symbol(temp_ast.get_var_def_var_name());
+
+                    if (temp_s == null && temp_s_parent == null) {
+
+                        table.add_new_symbol(new symbol(temp_ast.get_var_def_var_name(),
+                                "NA",
+                                "NA"));
+
+                    } else {
+
+                        err_list.add_new_error(new error("symbol " + temp_ast.get_var_def_var_name() + " already present", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+
+                    }
+
+                    break;
+                }
+                case "AST_VAR_DEF_ASSIGNMENT": {
+
+                    Log.e(TAG,"here inside block var def assignment");
+
+                    expression e = new expression();
+
+                    temp_s_parent = parent_symbol_table.search_symbol(temp_ast.get_var_def_var_name());
+
+                    temp_s = table.search_symbol(temp_ast.get_var_def_var_name());
+
+                    if (temp_s == null && temp_s_parent == null) {
+
+                        ArrayList<token> list = temp_ast.getVar_def_var_expr();
+
+                        String answer = e.evaluate_expression(list, err_list, table, temp_ast.get_ast_node_index());
+
+                        symbol s;
+
+                        if (answer != null) {
+
+                            Log.e("answer", ": " + answer);
+
+                            if (!e.getSTRING_FLAG()) {
+
+                                s = new symbol(temp_ast.get_var_def_var_name(), answer, "T_IDENTIFIER");
+
+                            } else {
+
+                                s = new symbol(temp_ast.get_var_def_var_name(), answer, "T_STRING");
+
+                            }
+
+                            table.add_new_symbol(s);
+
+                        }
+
+                    }else {
+
+                        err_list.add_new_error(new error("symbol " + temp_ast.get_var_def_var_name() + " already present", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+
+                    }
+
+                    break;
+                }
+                case "AST_VAR_DEF_ASSIGNMENT_FUNCTION": {
 
                     symbol s;
+                    temp_s = table.search_symbol(temp_ast.get_var_def_var_name());
+                    temp_s_parent = parent_symbol_table.search_symbol(temp_ast.get_var_def_var_name());
 
-                    if (answer != null){
+                    if (temp_s == null && temp_s_parent == null ) {
 
-                        Log.e("answer", ": " + answer);
+                        s = new symbol(temp_ast.get_var_def_var_name(), "NA", "NA");
 
-                        if( !e.getSTRING_FLAG() ){
+                        String answer;
 
-                            s = new symbol(temp_ast.get_var_def_var_name(), answer, "T_IDENTIFIER");
+                        if (temp_ast.get_function_name().equals("input")) {
 
-                        }else{
+                            answer = this.evaluate_input_function_call(temp_ast, k, err_list);
 
-                            s = new symbol(temp_ast.get_var_def_var_name(), answer, "T_STRING");
+                            if (answer != null) {
 
-                        }
+                                s.setValue(answer);
 
-                        table.add_new_symbol(s);
+                                s.setData_type("NUMBER");
 
-                    }
+                                table.update_table(s);
 
-                }
+                                Log.e("sensor_val : ", s.getValue());
 
-            }else if(temp_ast.get_type().equals("AST_VAR_DEF_ASSIGNMENT_FUNCTION")){
-
-                symbol s = table.search_symbol(temp_ast.get_var_def_var_name());
-
-                if(s == null){
-
-                    s = new symbol(temp_ast.get_var_def_var_name(), "NA", "NA");
-
-                    String answer;
-
-                    if(temp_ast.get_function_name().equals("input")){
-
-                        answer = this.evaluate_input_function_call(temp_ast, k, err_list);
-
-                        if( answer != null){
-
-                            s.setValue(answer);
-
-                            s.setData_type("NUMBER");
-
-                            table.update_table(s);
-
-                            Log.e("sensor_val : " , s.getValue());
+                            }
 
                         }
 
+                    } else {
+
+                        err_list.add_new_error(new error("variable " + temp_ast.get_var_def_var_name() + " is already declared", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+
                     }
 
-                }else{
-
-                    err_list.add_new_error(new error("variable " + temp_ast.get_var_def_var_name() + " is already declared", temp_ast.get_ast_node_index()));
-
+                    break;
                 }
+                case "AST_VAR_ASSIGNMENT": {
 
-            }else if( temp_ast.get_type().equals("AST_VAR_ASSIGNMENT")){
+                    symbol s = table.search_symbol(temp_ast.get_var_name());
+                    symbol parent_s = table.search_symbol(temp_ast.get_var_name());
 
-                symbol s = table.search_symbol(temp_ast.get_var_name());
+                    expression e = new expression();
 
-                expression e = new expression();
+                    if (s != null && parent_s == null) {
 
-                if( s != null){
+                        ArrayList<token> list = temp_ast.getVar_expr();
 
-                    ArrayList<token> list = temp_ast.getVar_expr();
+                        String answer = e.evaluate_expression(list, err_list, table, temp_ast.get_ast_node_index());
 
-                    String answer = e.evaluate_expression(list, err_list, table, temp_ast.get_ast_node_index());
+                        if (answer != null) {
 
-                    if( answer != null){
+                            Log.e("answer", ": " + answer);
 
-                        Log.e("answer", ": " + answer);
+                            if (!e.getSTRING_FLAG()) {
 
-                        if(!e.getSTRING_FLAG()){
+                                s.setValue(answer);
 
-                            s.setValue(answer);
+                                s.setData_type("NUMBER");
 
-                            s.setData_type("NUMBER");
+                                table.update_table(s);
 
-                            table.update_table(s);
+                            } else {
 
-                        }else{
+                                s.setValue(answer);
 
-                            s.setValue(answer);
+                                s.setData_type("STRING");
 
-                            s.setData_type("STRING");
+                                table.update_table(s);
 
-                            table.update_table(s);
+                            }
 
                         }
 
-                    }
+                    }else if(parent_s != null && s == null ){
 
-                }else{
+                        ArrayList<token> list = temp_ast.getVar_expr();
 
-                    err_list.add_new_error(new error("Variable " + temp_ast.get_var_name() + " is not declared", temp_ast.get_ast_node_index()));
+                        String answer = e.evaluate_expression(list, err_list, table, temp_ast.get_ast_node_index());
 
-                }
+                        if (answer != null) {
 
-            }else if( temp_ast.get_type().equals("AST_VAR_ASSIGNMENT_FUNCTION")){
+                            Log.e("answer", ": " + answer);
 
-                symbol s = table.search_symbol(temp_ast.get_var_name());
+                            if (!e.getSTRING_FLAG()) {
 
-                if(s != null){
+                                s.setValue(answer);
 
-                    String answer;
+                                s.setData_type("NUMBER");
 
-                    if(temp_ast.get_function_name().equals("input")){
+                                parent_symbol_table.update_table(s);
 
-                        answer = this.evaluate_input_function_call(temp_ast, k, err_list);
+                            } else {
 
-                        if( answer != null){
+                                s.setValue(answer);
 
-                            s.setValue(answer);
+                                s.setData_type("STRING");
 
-                            s.setData_type("NUMBER");
+                                parent_symbol_table.update_table(s);
 
-                            table.update_table(s);
-
-                            Log.e("sensor_val : " , s.getValue());
+                            }
 
                         }
 
+                    } else {
+
+                        err_list.add_new_error(new error("Variable " + temp_ast.get_var_name() + " is not declared", temp_ast.get_ast_node_index()));
+
+                        err_list.print_errors();
+                        return;
+
+
                     }
 
-                }else{
+                    break;
+                }
+                case "AST_VAR_ASSIGNMENT_FUNCTION": {
 
-                    err_list.add_new_error(new error("Variable " + temp_ast.get_var_def_var_name() + " is not declared", temp_ast.get_ast_node_index()));
+                    symbol s = table.search_symbol(temp_ast.get_var_name());
+                    symbol parent_s = parent_symbol_table.search_symbol(temp_ast.get_var_name());
+
+
+                    if (s != null && parent_s == null) {
+
+                        String answer;
+
+                        if (temp_ast.get_function_name().equals("input")) {
+
+                            answer = this.evaluate_input_function_call(temp_ast, k, err_list);
+
+                            if (answer != null) {
+
+                                s.setValue(answer);
+
+                                s.setData_type("NUMBER");
+
+                                table.update_table(s);
+
+                                Log.e("sensor_val : ", s.getValue());
+
+                            }
+
+                        }
+
+                    }else if( parent_s != null && s == null){
+
+                        String answer;
+
+                        if (temp_ast.get_function_name().equals("input")) {
+
+                            answer = this.evaluate_input_function_call(temp_ast, k, err_list);
+
+                            if (answer != null) {
+
+                                s.setValue(answer);
+
+                                s.setData_type("NUMBER");
+
+                                parent_symbol_table.update_table(s);
+
+                                Log.e("sensor_val : ", s.getValue());
+
+                            }
+
+                        }
+
+                    } else {
+
+                        err_list.add_new_error(new error("Variable " + temp_ast.get_var_def_var_name() + " is not declared", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+                    }
+
+                    break;
+                }
+                case "AST_CONDITIONAL_IF" : {
+
+                    Log.e(TAG, "AST_if");
+                    Log.e(TAG,"True block");
+                    temp_ast.getTrue_block().print_ast();
+
+                    expression e = new expression();
+
+                    symbol_table temp_table = new symbol_table();
+
+                    if (parent_symbol_table != null) {
+
+                        temp_table.getTable().addAll(parent_symbol_table.getTable());
+                        temp_table.getTable().addAll(table.getTable());
+
+                    } else {
+
+                        temp_table.getTable().addAll(table.getTable());
+
+                    }
+
+                    temp_table.printTable();
+
+                    for(token t: temp_ast.getConditional_statement_expr()){
+
+                        Log.e(TAG, t.get_content());
+
+                    }
+
+                    String answer = e.evaluate_logical_expression(temp_ast.getConditional_statement_expr() , err_list, temp_table, temp_ast.get_ast_node_index());
+
+                    if( answer != null ) {
+
+                        Log.e(TAG, answer);
+
+                        if (answer.equals("true")) {
+
+                            this.run_block(temp_table, temp_ast.getTrue_block(), err_list);
+
+                        }
+                    }else{
+
+                        err_list.print_errors();
+                        return;
+
+                    }
+                    break;
+                }
+                case "AST_CONDITIONAL_IF_ELSE" : {
+
+                    Log.e(TAG, "Block if else");
+
+                    Log.e(TAG, "AST_if_else");
+                    Log.e(TAG,"True block");
+                    temp_ast.getTrue_block().print_ast();
+                    Log.e(TAG,"False block");
+                    temp_ast.getFalse_block().print_ast();
+
+                    expression e = new expression();
+
+                    symbol_table temp_table = new symbol_table();
+
+                    if (parent_symbol_table != null) {
+
+                        temp_table.getTable().addAll(parent_symbol_table.getTable());
+                        temp_table.getTable().addAll(table.getTable());
+
+                    } else {
+
+                        temp_table.getTable().addAll(table.getTable());
+
+                    }
+
+                    temp_table.printTable();
+
+                    for(token t: temp_ast.getConditional_statement_expr()){
+
+                        Log.e(TAG, t.get_type());
+
+                    }
+
+                    String answer = e.evaluate_logical_expression(temp_ast.getConditional_statement_expr(), err_list, temp_table, temp_ast.get_ast_node_index());
+
+                    if( answer != null) {
+
+                        Log.e(TAG, answer);
+
+                        if (answer.equals("true")) {
+
+                            this.run_block(temp_table, temp_ast.getTrue_block(), err_list);
+
+                        } else {
+
+                            this.run_block(temp_table, temp_ast.getFalse_block(), err_list);
+
+                        }
+
+                    }else{
+
+                        err_list.print_errors();
+                        return;
+
+                    }
+                    break;
 
                 }
-
             }
 
 
@@ -225,22 +694,40 @@ public class evaluator {
 
     }
 
-    private void evaluate_function_call(keywords k, ast temp_ast, errors err_list, symbol_table table){
+    private void evaluate_function_call(keywords k, ast temp_ast, errors err_list, symbol_table table, symbol_table parent_symbol_table){
+
+
+        symbol_table temp_table = new symbol_table();
+
+        if( parent_symbol_table != null){
+
+            temp_table.getTable().addAll(table.getTable());
+            temp_table.getTable().addAll(parent_symbol_table.getTable());
+
+        }else{
+
+            temp_table.getTable().addAll(table.getTable());
+
+        }
 
         if(k.is_builtin_function(temp_ast.get_function_name())) {
 
-            if (temp_ast.get_function_name().equals("output")) {
+            switch (temp_ast.get_function_name()) {
+                case "output":
 
-               this.evaluate_output_function_call(temp_ast);
+                    this.evaluate_output_function_call(temp_ast);
 
-            } else if (temp_ast.get_function_name().equals("wait")) {
+                    break;
+                case "wait":
 
-                this.evaluate_wait_function_call(temp_ast, k, table, err_list);
+                    this.evaluate_wait_function_call(temp_ast, k, temp_table, err_list);
 
-            }else if (temp_ast.get_function_name().equals("input")) {
+                    break;
+                case "input":
 
-                this.evaluate_input_function_call(temp_ast, k ,err_list);
+                    this.evaluate_input_function_call(temp_ast, k, err_list);
 
+                    break;
             }
 
         }
@@ -254,8 +741,6 @@ public class evaluator {
         function_arg arg2 = (function_arg) args.get(1);
 
         if (arg1.get_arg_name().equals("LED")) {
-
-            Log.e(TAG, "here");
 
             CameraManager cm = (CameraManager) context.getSystemService(context.CAMERA_SERVICE);
 
@@ -294,7 +779,7 @@ public class evaluator {
                 if(k.is_num(s.getValue())){
 
                     try {
-                        TimeUnit.MILLISECONDS.sleep(Long.parseLong(arg1.get_arg_name()));
+                        TimeUnit.MILLISECONDS.sleep(Long.parseLong(s.getValue()));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -334,66 +819,77 @@ public class evaluator {
 
         if (k.is_keyword(arg1.get_arg_name())) {
 
-            if (arg1.get_arg_name().equals("LIGHT")) {
+            switch (arg1.get_arg_name()) {
+                case "LIGHT": {
 
-                String val = SENSOR_DATA.getString("LIGHT", "");
+                    String val = SENSOR_DATA.getString("LIGHT", "");
 
-                return val;
+                    return val;
 
-            } else if (arg1.get_arg_name().equals("TEMPERATURE")) {
+                }
+                case "TEMPERATURE": {
 
-                String val = SENSOR_DATA.getString("TEMPERATURE", "");
+                    String val = SENSOR_DATA.getString("TEMPERATURE", "");
 
-                return val;
+                    return val;
 
-            } else if(arg1.get_arg_name().equals("GYROSCOPEX")){
+                }
+                case "GYROSCOPEX": {
 
-                String val = SENSOR_DATA.getString("GYROSCOPEX", "");
+                    String val = SENSOR_DATA.getString("GYROSCOPEX", "");
 
-                return val;
+                    return val;
 
-            }else if(arg1.get_arg_name().equals("GYROSCOPEY")){
+                }
+                case "GYROSCOPEY": {
 
-                String val = SENSOR_DATA.getString("GYROSCOPEY", "");
+                    String val = SENSOR_DATA.getString("GYROSCOPEY", "");
 
-                return val;
+                    return val;
 
-            }else if(arg1.get_arg_name().equals("GYROSCOPEZ")){
+                }
+                case "GYROSCOPEZ": {
 
-                String val = SENSOR_DATA.getString("GYROSCOPEZ", "");
+                    String val = SENSOR_DATA.getString("GYROSCOPEZ", "");
 
-                return val;
+                    return val;
 
-            }else if (arg1.get_arg_name().equals("ACCELEROMETERX")){
+                }
+                case "ACCELEROMETERX": {
 
-                String val = SENSOR_DATA.getString("ACCELEROMETERX", "");
+                    String val = SENSOR_DATA.getString("ACCELEROMETERX", "");
 
-                return val;
+                    return val;
 
-            }else if (arg1.get_arg_name().equals("ACCELEROMETERY")){
+                }
+                case "ACCELEROMETERY": {
 
-                String val = SENSOR_DATA.getString("ACCELEROMETERY", "");
+                    String val = SENSOR_DATA.getString("ACCELEROMETERY", "");
 
-                return val;
+                    return val;
 
-            }else if (arg1.get_arg_name().equals("ACCELEROMETERZ")){
+                }
+                case "ACCELEROMETERZ": {
 
-                String val = SENSOR_DATA.getString("ACCELEROMETERZ", "");
+                    String val = SENSOR_DATA.getString("ACCELEROMETERZ", "");
 
-                return val;
+                    return val;
 
-            }else  if(arg1.get_arg_name().equals("HUMIDITY")){
+                }
+                case "HUMIDITY": {
 
-                String val = SENSOR_DATA.getString("HUMIDITY","");
+                    String val = SENSOR_DATA.getString("HUMIDITY", "");
 
-                return val;
+                    return val;
 
-            }else if(arg1.get_arg_name().equals("AIRPRESSURE")){
+                }
+                case "AIRPRESSURE": {
 
-                String val = SENSOR_DATA.getString("AIRPRESSURE", "");
+                    String val = SENSOR_DATA.getString("AIRPRESSURE", "");
 
-                return val;
+                    return val;
 
+                }
             }
 
         } else {

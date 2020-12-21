@@ -53,8 +53,6 @@ public class compiler {
 
 	public void run(ast_l ast_list){
 
-		Log.e(TAG, "here");
-
 		e = new evaluator(ast_list);
 		e.setContext(context);
 		e.run();

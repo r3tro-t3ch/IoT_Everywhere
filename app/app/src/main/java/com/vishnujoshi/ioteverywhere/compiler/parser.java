@@ -1,9 +1,11 @@
 package com.vishnujoshi.ioteverywhere.compiler;
 
 import android.content.Context;
+import android.media.session.MediaSession;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 class parser{
 
@@ -35,6 +37,16 @@ class parser{
 				this.l.next_char();
 				
 			}
+		}
+
+		if( this.l.get_current_char() == '\t'){
+
+			while (this.l.get_current_char() == '\t'){
+
+				this.l.next_char();
+
+			}
+
 		}
 
 		if( this.l.get_current_char() == '\n' ){
@@ -133,7 +145,19 @@ class parser{
 
 					   }
 			case '=' : {
-		
+
+							char next = this.l.peek_next_char();
+
+							if( next == '='){
+
+								token t = new token("T_EE", "==");
+								this.current_token = t;
+								this.l.next_char();
+								this.l.next_char();
+								return t;
+
+							}
+
 						    this.l.next_char();
 							this.set_current_token(new token("T_EQUAL", String.valueOf(l.get_current_char())));
 							return get_current_token();
@@ -141,18 +165,94 @@ class parser{
 					   }
 			case '>' : {
 
+							char next = this.l.peek_next_char();
+
+							if(next == '='){
+
+								token t = new token("T_GE", ">=");
+								this.current_token = t;
+								this.l.next_char();
+								this.l.next_char();
+								return	t;
+							}
+
 						    this.l.next_char();
 							this.set_current_token( new token("T_GREATER", String.valueOf(l.get_current_char())));
 							return get_current_token();
 								
 						}
 			case '<' : {
-			
-						    this.l.next_char();
+
+							char next = this.l.peek_next_char();
+
+							if(next == '='){
+
+								token t = new token("T_LE", "<=");
+								this.current_token = t;
+								this.l.next_char();
+								this.l.next_char();
+								return	t;
+
+							}
+
+							this.l.next_char();
 							this.set_current_token( new token("T_LESSER", String.valueOf(l.get_current_char())));
 							return get_current_token();
 
 					   }
+			case '|' : {
+
+						char next = this.l.peek_next_char();
+
+						if( next == '|'){
+
+							token t = new token("T_LOR", "||");
+							this.current_token = t;
+							this.l.next_char();
+							this.l.next_char();
+							return t;
+
+						}
+
+						this.l.next_char();
+						this.set_current_token( new token("T_BOR", String.valueOf(l.get_current_char())));
+						return get_current_token();
+			}
+			case '&' :{
+
+						char next = this.l.peek_next_char();
+
+						if( next == '&'){
+
+							this.set_current_token( new token("T_LAND", "&&"));
+							this.l.next_char();
+							this.l.next_char();
+							return get_current_token();
+
+						}
+
+						this.l.next_char();
+						this.set_current_token(new token("T_BAND", String.valueOf(l.get_current_char())));
+						return get_current_token();
+			}
+			case '!' :{
+
+						char next = this.l.get_current_char();
+
+						if ( next == '!'){
+
+							this.set_current_token( new token("T_NE", String.valueOf(l.get_current_char())));
+							this.l.next_char();
+							this.l.next_char();
+							return get_current_token();
+
+						}
+
+						this.l.next_char();
+						this.set_current_token(new token("T_LNOT", String.valueOf(this.l.get_current_char())));
+						return this.get_current_token();
+
+			}
 			case ',' : {
 
 							this.l.next_char();
@@ -197,6 +297,16 @@ class parser{
 				lex.next_char();
 				
 			}
+		}
+
+		if( lex.get_current_char() == '\t'){
+
+			while (lex.get_current_char() == '\t'){
+
+				lex.next_char();
+
+			}
+
 		}
 
 		if( lex.get_current_char() == '\n' ){
@@ -282,23 +392,91 @@ class parser{
 
 					   }
 			case '=' : {
-		
+
+							char next = lex.peek_next_char();
+
+							if( next == '='){
+
+								lex.next_char();
+								return (new token("T_EE", "=="));
+
+							}
+
 						    lex.next_char();
 							return(new token("T_EQUAL", /*String.valueOf(l.get_current_char())*/  l.get_current_char() + "\0"));
 
 					   }
 			case '>' : {
+							char next = lex.peek_next_char();
+
+							if( next == '='){
+
+								lex.next_char();
+								return (new token("T_GE", ">="));
+
+							}
 
 						    lex.next_char();
 							return ( new token("T_GREATER", String.valueOf(l.get_current_char())));
 								
 						}
 			case '<' : {
-			
+							char next = lex.peek_next_char();
+
+							if( next == '='){
+
+								lex.next_char();
+								return (new token("T_LE", "<="));
+
+							}
+
 						    lex.next_char();
 							return ( new token("T_LESSER", String.valueOf(l.get_current_char())));
 
 					   }
+			case '|' :{
+							char next = lex.peek_next_char();
+
+							if( next == '|'){
+
+								lex.next_char();
+								return (new token("T_LOR", "||"));
+
+							}
+
+							lex.next_char();
+							return ( new token("T_BOR", String.valueOf(l.get_current_char())));
+
+			}
+			case '&' :{
+
+						char next = lex.peek_next_char();
+
+						if( next == '&'){
+
+							lex.next_char();
+							return (new token("T_LAND", "&&"));
+
+						}
+
+						lex.next_char();
+						return ( new token("T_BAND", String.valueOf(l.get_current_char())));
+
+			}
+			case '!' :{
+
+						char next = lex.peek_next_char();
+
+						if( next == '='){
+
+							lex.next_char();
+							return (new token("T_NE", "!="));
+						}
+
+						lex.next_char();
+						return ( new token("T_LNOT", String.valueOf(l.get_current_char())));
+
+			}
 			case ',' : {
 
 							lex.next_char();
@@ -449,7 +627,7 @@ class parser{
 
 				node.setVar_def_var_expr(this.parse_expression());
 
-				if( e.is_postfix_valid(node.getVar_def_var_expr()) ){
+				if( !e.is_postfix_valid(node.getVar_def_var_expr()) ){
 
 					err_list.add_new_error(new error("Invalid expression", list.get_ast_list_count()));
 					return null;
@@ -763,7 +941,7 @@ class parser{
 
 			node.setVar_expr( this.parse_expression() );
 
-			if( e.is_postfix_valid(node.getVar_expr()) ){
+			if( !e.is_postfix_valid(node.getVar_expr()) ){
 
 				err_list.add_new_error(new error("Invalid expression", list.get_ast_list_count()));
 
@@ -784,6 +962,166 @@ class parser{
 		return null;
 	}
 
+	public ArrayList<token> parse_condtional_expression(){
+
+		ArrayList<token> list = new ArrayList<>();
+
+		this.get_next_token();
+
+		expression e = new expression();
+
+		while ( e.is_logical_expression_token(this.get_current_token())){
+
+			list.add(this.get_current_token());
+
+			this.get_next_token();
+
+		}
+
+		if( list.size() == 1){
+
+			return list;
+
+		}
+
+		ArrayList<token> postfix = e.infix_to_postfix(list);
+
+		return postfix;
+
+	}
+
+	public ast parse_conditional_statements( errors err_list, ast_l list){
+
+		ast node = new ast("AST_CONDITIONAL_IF");
+
+		expression e = new expression();
+
+		if( !this.eat(this.get_current_token(), "T_KEYWORD", err_list, list.get_ast_list_count())){
+
+			return null;
+
+		}
+
+		this.get_next_token(); //(
+
+		if( !this.eat(this.get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count())){
+
+			return null;
+
+		}
+
+		ArrayList<token> expr = this.parse_condtional_expression();
+
+		if( !e.is_postfix_valid(expr) || expr.size() == 1){
+
+			err_list.add_new_error( new error( "Invalid conditional statement",  list.get_ast_list_count()));
+
+			return null;
+
+		}
+
+		node.setConditional_statement_expr(expr);
+
+		if( !this.eat(this.get_current_token(), "T_RPAREN", err_list, list.get_ast_list_count())){
+
+			return null;
+
+		}
+
+		Stack<token> s = new Stack<>();
+
+		ast_l true_block = this.parse_statement_block(err_list, s, list);
+
+		if( true_block != null ) {
+
+			if( true_block.get_ast_list_count() == 0){
+
+				err_list.add_new_error( new error("Empty if block", list.get_ast_list_count()));
+				return null;
+
+			}
+
+			node.setTrue_block(true_block);
+
+		}else{
+
+			return	null;
+
+		}
+
+		token t = this.peek_next_token();
+
+		while ( t.get_type().equals("T_NEWLINE")){
+
+			this.get_next_token();
+			this.parse_newline(err_list, list);
+			t = peek_next_token();
+
+		}
+
+		switch (get_current_token().get_type()){
+
+
+			case "T_NULL" :{
+
+				node.set_ast_node_index(list.get_ast_list_count());
+				return node;
+
+			}
+			case "T_KEYWORD" :{
+
+				if( get_current_token().get_content().equals("else") ){
+
+					if( !this.eat(this.get_current_token(), "T_KEYWORD", err_list, list.get_ast_list_count())){
+
+						return null;
+
+					}
+
+					ast_l false_block = this.parse_statement_block(err_list, s, list);
+
+					node.set_type("AST_CONDITIONAL_IF_ELSE");
+
+					if( false_block != null){
+
+						if( false_block.get_ast_list_count() == 0){
+
+							err_list.add_new_error(new error("Empty else block", list.get_ast_list_count()));
+							return null;
+
+						}
+
+						node.setFalse_block(false_block);
+
+					}else {
+
+						return null;
+
+					}
+
+				}
+
+				break;
+
+			}
+
+			case "T_NEWLINE" : {
+
+				this.parse_newline(err_list, list);
+
+				break;
+
+			}
+
+
+		}
+
+		node.set_ast_node_index(list.get_ast_list_count());
+
+		return node;
+
+	}
+
 	public ast_l parse_statements(){
 	
 		errors err_list = new errors();
@@ -799,6 +1137,16 @@ class parser{
 				if( this.get_current_token().get_content().equals("var")){
 
 					ast node = this.parse_var_def(err_list, ast_list);
+
+					if(node != null){
+
+						ast_list.add_new_ast(node);
+
+					}
+
+				}else if ( this.get_current_token().get_content().equals("if") ){
+
+					ast node = this.parse_conditional_statements(err_list, ast_list);
 
 					if(node != null){
 
@@ -838,6 +1186,8 @@ class parser{
 
 			}
 
+
+
 			if( this.get_current_token().get_type().equals("T_NULL") ){
 				break;
 			}
@@ -863,6 +1213,120 @@ class parser{
 
 		}
 
+
+	}
+
+	public ast_l parse_statement_block(errors err_list, Stack<token> s, ast_l parent_ast_list){
+
+		ast_l ast_list = new ast_l();
+
+		this.get_next_token(); // {
+
+		if( !this.eat(this.get_current_token(), "T_LBRACE", err_list, parent_ast_list.get_ast_list_count()) ){
+
+			return null;
+
+		}
+
+		s.push(this.get_current_token());
+
+		this.get_next_token();
+
+		if( this.get_current_token().get_type().equals("T_NEWLINE") ){
+
+			while( this.get_current_token().get_type().equals("T_NEWLINE") ){
+
+				this.parse_newline(err_list, ast_list);
+				this.get_next_token();
+
+			}
+
+		}
+
+		while( s.size() > 0 && !this.get_current_token().get_type().equals("T_RBRACE") ){
+
+			if( this.get_current_token().get_type().equals("T_KEYWORD") ){
+
+				if( this.get_current_token().get_content().equals("var")){
+
+					ast node = this.parse_var_def(err_list, ast_list);
+
+					if(node != null){
+
+						ast_list.add_new_ast(node);
+
+					}
+
+				}else if( this.get_current_token().get_content().equals("if")){
+
+					ast node = this.parse_conditional_statements(err_list, ast_list);
+
+					if( node != null ){
+
+						ast_list.add_new_ast(node);
+
+					}
+
+				}
+
+			}else if(this.get_current_token().get_type().equals("T_IDENTIFIER") ){
+
+				token t = this.peek_next_token();
+
+				if( t.get_type().equals("T_EQUAL") ){
+
+					ast node = this.parse_var_assignment(err_list, ast_list);
+
+					if(node != null){
+
+						ast_list.add_new_ast(node);
+
+					}
+
+				}else if( t.get_type().equals("T_LPAREN") ){
+
+					ast node = this.parse_function_call(err_list, ast_list);
+
+					if(node != null){
+
+						ast_list.add_new_ast(node);
+
+					}
+
+				}else{
+					this.parse_newline(err_list, ast_list);
+				}
+
+			}
+			if( this.get_current_token().get_type().equals("T_LBRACE")){
+
+				s.push(this.get_current_token());
+
+			}
+
+			if( this.get_current_token().get_type().equals("T_RBRACE")){
+
+				s.pop();
+
+			}
+
+			if( this.get_current_token().get_type().equals("T_NULL") ){
+				break;
+			}
+
+			if( this.get_current_token().get_type().equals("T_NEWLINE" )){
+
+				this.parse_newline(err_list, ast_list);
+
+			}
+
+			this.get_next_token();
+
+		}
+
+		this.get_next_token();
+
+		return ast_list;
 
 	}
 }

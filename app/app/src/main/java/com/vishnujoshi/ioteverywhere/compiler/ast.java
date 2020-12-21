@@ -24,6 +24,11 @@ class ast{
 	private String var_content;
 	private ArrayList<token> var_expr;
 
+	//conditonal statements
+	private ArrayList<token> conditional_statement_expr;
+	private ast_l true_block;
+	private ast_l false_block;
+
 	//constructor
 	public ast(String type){
 
@@ -136,6 +141,30 @@ class ast{
 
 	public void setVar_expr(ArrayList<token> var_expr) {
 		this.var_expr = var_expr;
+	}
+
+	public ArrayList<token> getConditional_statement_expr() {
+		return conditional_statement_expr;
+	}
+
+	public void setConditional_statement_expr(ArrayList<token> conditional_statement_expr) {
+		this.conditional_statement_expr = conditional_statement_expr;
+	}
+
+	public ast_l getTrue_block() {
+		return true_block;
+	}
+
+	public void setTrue_block(ast_l true_block) {
+		this.true_block = true_block;
+	}
+
+	public ast_l getFalse_block() {
+		return false_block;
+	}
+
+	public void setFalse_block(ast_l false_block) {
+		this.false_block = false_block;
 	}
 }
 

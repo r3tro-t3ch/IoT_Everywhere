@@ -24,6 +24,16 @@ public class symbol_table {
         this.table = table;
     }
 
+    public void printTable(){
+
+        for(symbol s : this.table){
+
+            System.out.println("Name: " + s.getName() + ", Val: " + s.getValue() + ", Data Type: "+s.getData_type());
+
+        }
+
+    }
+
     public symbol search_symbol(String symbol_name){
 
         for(symbol s : this.table){

@@ -35,7 +35,13 @@ class lexer{
 		this.index++;
 		this.current_char = this.code[this.index];
 	
-	} 
+	}
+
+	public char peek_next_char(){
+
+		return this.code[index+1];
+
+	}
 
 	public String get_string(){
 
