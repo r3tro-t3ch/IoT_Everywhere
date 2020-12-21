@@ -363,7 +363,7 @@ public class expression {
 
                 } else {
 
-                    int left_operand = 0, right_operand = 0;
+                    float left_operand = 0, right_operand = 0;
 
                     token left = stack.pop();
                     token right = stack.pop();
@@ -376,9 +376,12 @@ public class expression {
 
                             symbol s = table.search_symbol(left.get_content());
 
+                            keywords k = new keywords();
+
                             if(s != null ) {
-                                left_operand = Integer.parseInt(s.getValue());
-                                right_operand = Integer.parseInt(right.get_content());
+
+                                left_operand = Float.parseFloat(s.getValue());
+                                right_operand = Float.parseFloat(right.get_content());
 
                             }
 
@@ -387,8 +390,8 @@ public class expression {
 
                             symbol s = table.search_symbol(right.get_content());
 
-                            right_operand = Integer.parseInt(s.getValue());
-                            left_operand = Integer.parseInt(left.get_content());
+                            right_operand = Float.parseFloat(s.getValue());
+                            left_operand = Float.parseFloat(left.get_content());
 
                         }else{
 
@@ -397,15 +400,15 @@ public class expression {
                             l = table.search_symbol(left.get_content());
                             r = table.search_symbol(right.get_content());
 
-                            left_operand = Integer.parseInt(l.getValue());
-                            right_operand = Integer.parseInt(r.getValue());
+                            left_operand = Float.parseFloat(l.getValue());
+                            right_operand = Float.parseFloat(r.getValue());
 
                         }
 
                     }else{
 
-                        left_operand = Integer.parseInt(left.get_content());
-                        right_operand = Integer.parseInt(right.get_content());
+                        left_operand = Float.parseFloat(left.get_content());
+                        right_operand = Float.parseFloat(right.get_content());
 
                     }
 
@@ -413,31 +416,94 @@ public class expression {
                         case "T_PLUS":
 
                             answer = String.valueOf(left_operand + right_operand);
-                            stack.push(new token("T_CONSTANT", answer));
+
+                            String tempAnswer = answer.replaceAll("^\\d*\\.","");
+
+                            int temp = Integer.parseInt(tempAnswer);
+
+                            if( temp == 0){
+
+                                stack.push(new token("T_CONSTANT", String.valueOf( (int) (Math.round(Float.parseFloat(answer))))));
+
+                            }else{
+
+                                stack.push(new token("T_CONSTANT", answer));
+
+                            }
+
 
                             break;
                         case "T_MINUS":
 
                             answer = String.valueOf(left_operand - right_operand);
-                            stack.push(new token("T_CONSTANT", answer));
 
+                            tempAnswer = answer.replaceAll("^\\d*\\.","");
+
+                            temp = Integer.parseInt(tempAnswer);
+
+                            if( temp == 0){
+
+                                stack.push(new token("T_CONSTANT", String.valueOf( (int) (Math.round(Float.parseFloat(answer))))));
+
+                            }else{
+
+                                stack.push(new token("T_CONSTANT", answer));
+
+                            }
                             break;
                         case "T_ASTERIX":
 
                             answer = String.valueOf(left_operand * right_operand);
-                            stack.push(new token("T_CONSTANT", answer));
 
+                            tempAnswer = answer.replaceAll("^\\d*\\.","");
+
+                            temp = Integer.parseInt(tempAnswer);
+
+                            if( temp == 0){
+
+                                stack.push(new token("T_CONSTANT", String.valueOf( (int) (Math.round(Float.parseFloat(answer))))));
+
+                            }else{
+
+                                stack.push(new token("T_CONSTANT", answer));
+
+                            }
                             break;
                         case "T_FSLASH":
 
                             answer = String.valueOf(left_operand / right_operand);
-                            stack.push(new token("T_CONSTANT", answer));
 
+                            tempAnswer = answer.replaceAll("^\\d*\\.","");
+
+                            temp = Integer.parseInt(tempAnswer);
+
+                            if( temp == 0){
+
+                                stack.push(new token("T_CONSTANT", String.valueOf( (int) (Math.round(Float.parseFloat(answer))))));
+
+                            }else{
+
+                                stack.push(new token("T_CONSTANT", answer));
+
+                            }
                             break;
                         case "T_MOD" :
 
                             answer = String.valueOf(left_operand % right_operand);
-                            stack.push(new token("T_CONSTANT", answer));
+
+                            tempAnswer = answer.replaceAll("^\\d*\\.","");
+
+                            temp = Integer.parseInt(tempAnswer);
+
+                            if( temp == 0){
+
+                                stack.push(new token("T_CONSTANT", String.valueOf( (int) (Math.round(Float.parseFloat(answer))))));
+
+                            }else{
+
+                                stack.push(new token("T_CONSTANT", answer));
+
+                            }
 
                             break;
 
