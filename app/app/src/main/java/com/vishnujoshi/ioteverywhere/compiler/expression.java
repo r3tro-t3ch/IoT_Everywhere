@@ -572,8 +572,8 @@ public class expression {
                             if( left_operand.getData_type().equals("NUMBER") &&
                                  right_operand.getData_type().equals("NUMBER") ){
 
-                                int l = Integer.parseInt(left_operand.getValue());
-                                int r = Integer.parseInt(right_operand.getValue());
+                                double l = Double.parseDouble(left_operand.getValue());
+                                double r = Double.parseDouble(right_operand.getValue());
 
                                 if( l > r){
 
@@ -598,8 +598,8 @@ public class expression {
                             if( left_operand.getData_type().equals("NUMBER") &&
                                     right_operand.getData_type().equals("NUMBER") ){
 
-                                int l = Integer.parseInt(left_operand.getValue());
-                                int r = Integer.parseInt(right_operand.getValue());
+                                double l = Double.parseDouble(left_operand.getValue());
+                                double r = Double.parseDouble(right_operand.getValue());
 
                                 if( l < r){
 
@@ -624,8 +624,8 @@ public class expression {
                             if( left_operand.getData_type().equals("NUMBER") &&
                                     right_operand.getData_type().equals("NUMBER") ){
 
-                                int l = Integer.parseInt(left_operand.getValue());
-                                int r = Integer.parseInt(right_operand.getValue());
+                                double l = Double.parseDouble(left_operand.getValue());
+                                double r = Double.parseDouble(right_operand.getValue());
 
                                 if( l >= r){
 
@@ -650,8 +650,8 @@ public class expression {
                             if( left_operand.getData_type().equals("NUMBER") &&
                                     right_operand.getData_type().equals("NUMBER") ){
 
-                                int l = Integer.parseInt(left_operand.getValue());
-                                int r = Integer.parseInt(right_operand.getValue());
+                                double l = Double.parseDouble(left_operand.getValue());
+                                double r = Double.parseDouble(right_operand.getValue());
 
                                 if( l <= r){
 

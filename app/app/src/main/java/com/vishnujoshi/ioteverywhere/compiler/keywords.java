@@ -22,26 +22,28 @@ class keywords{
     	"break",
     	"true",
     	"false",
-		"LED",
-		"SPEAKER",
-		"LIGHT",
-		"MIC",
-		"TEMPERATURE",
-		"ACCELEROMETERX",
-		"ACCELEROMETERY",
-		"ACCELEROMETERZ",
-		"GYROSCOPEX",
-		"GYROSCOPEY",
-		"GYROSCOPEZ",
-		"AIRPRESSURE",
-		"HUMIDITY",
-		};
+		"led",
+		"speaker",
+		"light",
+		"mic",
+		"temperature",
+		"accelerometerX",
+		"accelerometerY",
+		"accelerometerZ",
+		"gyroscopeX",
+		"gyroscopeY",
+		"gyroscopeZ",
+		"airPressure",
+		"humidity",
+	};
 
 	private static String BUILTIN_FUNCTION[] = {
 		"output",
 		"input",
 		"wait",
 		"print",
+		"call",
+		"message",
 	};
 
 	private static ArrayList<String> BUILTIN_FUNCTION_LIST = new ArrayList<String>(Arrays.asList(BUILTIN_FUNCTION));
@@ -87,11 +89,23 @@ class keywords{
 	        return false;
 	    }
 	    try {
-	        double d = Double.parseDouble(str);
+	        int d = Integer.parseInt(str);
 	    } catch (NumberFormatException e) {
 	        return false;
 	    }
 	    return true;
+	}
+
+	public boolean is_float(String str) {
+		if (str == null) {
+			return false;
+		}
+		try {
+			float d = Float.parseFloat(str);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
 	}
 
 }

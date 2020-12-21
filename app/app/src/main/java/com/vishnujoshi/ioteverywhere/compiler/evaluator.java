@@ -8,6 +8,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Build;
 import android.util.Log;
 
@@ -15,6 +17,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.core.util.TimeUtils;
+
+import net.mabboud.android_tone_player.ContinuousBuzzer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,7 +148,7 @@ public class evaluator {
 
                                 s.setData_type("NUMBER");
 
-                                table.update_table(s);
+                                table.add_new_symbol(s);
 
                                 Log.e("sensor_val : ", s.getValue());
 
@@ -740,25 +744,48 @@ public class evaluator {
         function_arg arg1 = (function_arg) args.get(0);
         function_arg arg2 = (function_arg) args.get(1);
 
-        if (arg1.get_arg_name().equals("LED")) {
+        switch (arg1.get_arg_name()) {
 
-            CameraManager cm = (CameraManager) context.getSystemService(context.CAMERA_SERVICE);
+            case "led": {
 
-            if (arg2.get_arg_name().equals("HIGH")) {
+                CameraManager cm = (CameraManager) context.getSystemService(context.CAMERA_SERVICE);
 
-                try {
-                    cm.setTorchMode("0", true);
-                } catch (CameraAccessException e) {
-                    e.printStackTrace();
+                if (arg2.get_arg_name().equals("HIGH")) {
+
+                    try {
+                        cm.setTorchMode("0", true);
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+
+                } else if (arg2.get_arg_name().equals("LOW")) {
+
+                    try {
+                        cm.setTorchMode("0", false);
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
 
-            } else if (arg2.get_arg_name().equals("LOW")) {
+                break;
 
-                try {
-                    cm.setTorchMode("0", false);
-                } catch (CameraAccessException e) {
-                    e.printStackTrace();
+            }
+            case "speaker" : {
+
+                ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+
+                Thread t = new Thread();
+
+                if( arg2.get_arg_name().equals("HIGH")){
+
+                    toneGenerator.startTone(ToneGenerator.TONE_DTMF_1, 3600000);
+
+                }else if( arg2.get_arg_name().equals("LOW")){
+
+                    toneGenerator.stopTone();
+
                 }
+
             }
 
         }
@@ -820,70 +847,70 @@ public class evaluator {
         if (k.is_keyword(arg1.get_arg_name())) {
 
             switch (arg1.get_arg_name()) {
-                case "LIGHT": {
+                case "light": {
 
                     String val = SENSOR_DATA.getString("LIGHT", "");
 
                     return val;
 
                 }
-                case "TEMPERATURE": {
+                case "temperature": {
 
                     String val = SENSOR_DATA.getString("TEMPERATURE", "");
 
                     return val;
 
                 }
-                case "GYROSCOPEX": {
+                case "gyroscopeX": {
 
                     String val = SENSOR_DATA.getString("GYROSCOPEX", "");
 
                     return val;
 
                 }
-                case "GYROSCOPEY": {
+                case "gyroscopeY": {
 
                     String val = SENSOR_DATA.getString("GYROSCOPEY", "");
 
                     return val;
 
                 }
-                case "GYROSCOPEZ": {
+                case "gyroscopeZ": {
 
                     String val = SENSOR_DATA.getString("GYROSCOPEZ", "");
 
                     return val;
 
                 }
-                case "ACCELEROMETERX": {
+                case "accelerometerX": {
 
                     String val = SENSOR_DATA.getString("ACCELEROMETERX", "");
 
                     return val;
 
                 }
-                case "ACCELEROMETERY": {
+                case "accelerometerY": {
 
                     String val = SENSOR_DATA.getString("ACCELEROMETERY", "");
 
                     return val;
 
                 }
-                case "ACCELEROMETERZ": {
+                case "accelerometerZ": {
 
                     String val = SENSOR_DATA.getString("ACCELEROMETERZ", "");
 
                     return val;
 
                 }
-                case "HUMIDITY": {
+                case "humidity": {
 
                     String val = SENSOR_DATA.getString("HUMIDITY", "");
 
                     return val;
 
                 }
-                case "AIRPRESSURE": {
+                case "airPressure": {
 
                     String val = SENSOR_DATA.getString("AIRPRESSURE", "");
 

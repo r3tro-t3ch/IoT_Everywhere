@@ -72,7 +72,7 @@ class lexer{
 		ArrayList<Character> identifier = new ArrayList<Character>();
 		identifier.add(this.current_char);
 		this.next_char();
-		while( is_alpha_numeric( this.current_char )){
+		while( is_alpha_numeric( this.current_char ) || this.current_char == '.'){
 
 			identifier.add(this.current_char);
 			this.next_char();

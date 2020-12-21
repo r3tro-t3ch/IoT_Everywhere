@@ -11,7 +11,7 @@ class parser{
 
 	private token current_token;
 	private lexer l;
-	private String TAG = this.getClass().getSimpleName();
+	private final String TAG = this.getClass().getSimpleName();
 
 	//constructor
 	parser(lexer l){
@@ -57,11 +57,11 @@ class parser{
 
 		}
 			
-		if( this.l.is_alpha_numeric(this.l.get_current_char()) ){
+		if( this.l.is_alpha_numeric(this.l.get_current_char()) || this.l.get_current_char() == '.' ){
 
 			String identifier = this.l.get_identifier();
 
-			if( k.is_num(identifier) ){
+			if( k.is_num(identifier) || k.is_float(identifier) ){
 					
 				this.set_current_token( new token("T_CONSTANT", identifier));
 				return get_current_token();
@@ -270,7 +270,7 @@ class parser{
 					   }
 				
 		}
-			
+
 		return null;
 
 	}
@@ -316,11 +316,11 @@ class parser{
 
 		}
 			
-		if( lex.is_alpha_numeric(lex.get_current_char()) ){
+		if( lex.is_alpha_numeric(lex.get_current_char()) || lex.get_current_char() == '.' ){
 
 			String identifier = lex.get_identifier();
 
-			if( k.is_num(identifier) ){
+			if( k.is_num(identifier) || k.is_float(identifier)){
 					
 				return new token("T_CONSTANT", identifier);
 
