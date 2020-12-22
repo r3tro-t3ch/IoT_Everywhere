@@ -990,6 +990,56 @@ class parser{
 
 	}
 
+	public ast parse_looping_statements( errors err_list, ast_l list){
+
+		ast node = new ast("AST_LOOP_INFINITE");
+
+		if( !this.eat(this.get_current_token(), "T_KEYWORD",err_list, list.get_ast_list_count())){
+
+			return null;
+
+		}
+
+		this.get_next_token(); // (
+
+		token t = this.peek_next_token();
+
+		switch (t.get_type()){
+
+			case "T_RPAREN":{
+
+				this.get_next_token(); // )
+
+				Stack<token> s =new Stack<>();
+
+				ast_l loop_code_block = this.parse_statement_block(err_list, s, list);
+
+				if( loop_code_block != null ) {
+
+					if( loop_code_block.get_ast_list_count() == 0){
+
+						err_list.add_new_error( new error("Empty loop block", list.get_ast_list_count()));
+						return null;
+
+					}
+
+					node.setLoop_code_block(loop_code_block);
+
+				}else{
+
+					return	null;
+
+				}
+
+			}
+
+
+		}
+
+		return node;
+
+	}
+
 	public ast parse_conditional_statements( errors err_list, ast_l list){
 
 		ast node = new ast("AST_CONDITIONAL_IF");
@@ -1149,6 +1199,16 @@ class parser{
 					ast node = this.parse_conditional_statements(err_list, ast_list);
 
 					if(node != null){
+
+						ast_list.add_new_ast(node);
+
+					}
+
+				}else if( this.get_current_token().get_content().equals("loop") ){
+
+					ast node = this.parse_looping_statements(err_list, ast_list);
+
+					if( node != null ){
 
 						ast_list.add_new_ast(node);
 

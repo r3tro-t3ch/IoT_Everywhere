@@ -29,6 +29,10 @@ class ast{
 	private ast_l true_block;
 	private ast_l false_block;
 
+	//looping statements
+	private ArrayList<token> loop_statement_expr;
+	private ast_l loop_code_block;
+
 	//constructor
 	public ast(String type){
 
@@ -40,6 +44,22 @@ class ast{
 	
 	//getters and setters
 	//type
+	public ArrayList<token> getLoop_statement_expr() {
+		return loop_statement_expr;
+	}
+
+	public void setLoop_statement_expr(ArrayList<token> loop_statement_expr) {
+		this.loop_statement_expr = loop_statement_expr;
+	}
+
+	public ast_l getLoop_code_block() {
+		return loop_code_block;
+	}
+
+	public void setLoop_code_block(ast_l loop_code_block) {
+		this.loop_code_block = loop_code_block;
+	}
+
 	public String get_type(){
 		return this.type;
 	}

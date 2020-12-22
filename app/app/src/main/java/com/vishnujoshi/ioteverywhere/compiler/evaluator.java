@@ -312,6 +312,14 @@ public class evaluator {
 
                 }
 
+                case "AST_LOOP_INFINITE" : {
+
+                    while (true) {
+                        this.run_block(table, temp_ast.getLoop_code_block(), err_list);
+                    }
+
+                }
+
             }
 
         }
@@ -495,19 +503,19 @@ public class evaluator {
 
                             if (!e.getSTRING_FLAG()) {
 
-                                s.setValue(answer);
+                                parent_s.setValue(answer);
 
-                                s.setData_type("NUMBER");
+                                parent_s.setData_type("NUMBER");
 
-                                parent_symbol_table.update_table(s);
+                                parent_symbol_table.update_table(parent_s);
 
                             } else {
 
-                                s.setValue(answer);
+                                parent_s.setValue(answer);
 
-                                s.setData_type("STRING");
+                                parent_s.setData_type("STRING");
 
-                                parent_symbol_table.update_table(s);
+                                parent_symbol_table.update_table(parent_s);
 
                             }
 
@@ -563,13 +571,13 @@ public class evaluator {
 
                             if (answer != null) {
 
-                                s.setValue(answer);
+                                parent_s.setValue(answer);
 
-                                s.setData_type("NUMBER");
+                                parent_s.setData_type("NUMBER");
 
-                                parent_symbol_table.update_table(s);
+                                parent_symbol_table.update_table(parent_s);
 
-                                Log.e("sensor_val : ", s.getValue());
+                                Log.e("sensor_val : ", parent_s.getValue());
 
                             }
 
