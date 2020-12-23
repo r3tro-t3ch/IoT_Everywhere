@@ -740,9 +740,32 @@ public class evaluator {
                     this.evaluate_input_function_call(temp_ast, k, err_list);
 
                     break;
+
+                case "call":
+
+                    this.evaluate_call_function_call(temp_ast);
+
+                    break;
+                case "message":
+
+                    this.evaluate_message_function_call(temp_ast);
             }
 
         }
+
+    }
+
+    private void evaluate_call_function_call(ast temp_ast){
+
+        Log.e(TAG, temp_ast.get_function_name());
+        Log.e(TAG, "args : " + temp_ast.get_args_list().get(0).get_arg_name());
+
+    }
+
+    private void evaluate_message_function_call(ast temp_ast){
+
+        Log.e(TAG, temp_ast.get_function_name());
+        Log.e(TAG, "args : " + temp_ast.get_args_list().get(0).get_arg_name() + ", " + temp_ast.get_args_list().get(1).get_arg_name());
 
     }
 

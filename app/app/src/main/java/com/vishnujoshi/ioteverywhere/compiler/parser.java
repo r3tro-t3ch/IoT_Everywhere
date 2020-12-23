@@ -574,7 +574,6 @@ class parser{
 		this.get_next_token();
 
 		if( !this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count()) ){
-			System.out.println("here");
 			error_flag = true;
 			return null;
 		}
@@ -684,148 +683,29 @@ class parser{
 
 			node = new ast("AST_BUILTIN_FUNCTION_CALL");
 
-			if( get_current_token().get_content().equals("output") ){
+			switch (get_current_token().get_content()) {
+				case "output": {
 
-				node.set_function_name(get_current_token().get_content());
+					node.set_function_name(get_current_token().get_content());
 
-				this.get_next_token(); //(
+					this.get_next_token(); //(
 
-				if( !this.eat(get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count()) ){
 
-					error_flag = true;
-					return null;
+					if (!this.eat(get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count())) {
 
-				}
-
-				//first arguement
-
-				token t = peek_next_token();
-
-				this.get_next_token();
-	
-				if( !this.eat(this.get_current_token(), "T_KEYWORD", err_list, list.get_ast_list_count() )){
-	
-					error_flag = true;
-					return null;
-
-				}
-
-				function_arg arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
-
-				node.add_function_arg(arg);
-
-				//comma
-				
-				this.get_next_token();
-
-				if( !this.eat(get_current_token(), "T_COMMA", err_list, list.get_ast_list_count()) ){
-
-					error_flag = false;
-					return null;
-
-				}
-
-				//second arguement
-				t = peek_next_token();
-
-				if( t.get_type().equals("T_CONSTANT") ){
-
-					this.get_next_token();
-	
-					if( !this.eat(this.get_current_token(), "T_CONSTANT", err_list, list.get_ast_list_count() )){
-	
 						error_flag = true;
 						return null;
 
 					}
 
-					arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
+					//first arguement
 
-					node.add_function_arg(arg);
-
-				}else if( t.get_type().equals("T_IDENTIFIER") ){
+					token t = peek_next_token();
 
 					this.get_next_token();
-	
-					if( !this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count() )){
-	
-						error_flag = true;
-						return null;
 
-					}
+					if (!this.eat(this.get_current_token(), "T_KEYWORD", err_list, list.get_ast_list_count())) {
 
-					arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
-
-					node.add_function_arg(arg);
-
-				}else if( t.get_type().equals("T_KEYWORD") ){
-
-					this.get_next_token();
-	
-					if( !this.eat(this.get_current_token(), "T_KEYWORD", err_list, list.get_ast_list_count() )){
-	
-						error_flag = true;
-						return null;
-
-					}
-
-					arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
-
-					node.add_function_arg(arg);
-
-				}
-
-			}else if( get_current_token().get_content().equals("input") ){
-
-				node.set_function_name(get_current_token().get_content());
-
-				this.get_next_token(); //(
-
-				if( !this.eat(get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count()) ){
-
-					error_flag = true;
-					return null;
-
-				}
-
-				//first arguement
-
-				this.get_next_token();
-	
-				if( !this.eat(this.get_current_token(), "T_KEYWORD", err_list, list.get_ast_list_count() )){
-	
-					error_flag = true;
-					return null;
-
-				}
-
-				function_arg arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
-
-				node.add_function_arg(arg);
-
-			}else if( get_current_token().get_content().equals("wait")){
-
-				node.set_function_name(get_current_token().get_content());
-
-				this.get_next_token(); //(
-
-				if( !this.eat(get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count()) ){
-
-					error_flag = true;
-					return null;
-
-				}
-
-				//first arguement
-
-				token t = peek_next_token();
-
-				if( t.get_type().equals("T_CONSTANT") ){
-
-					this.get_next_token();
-	
-					if( !this.eat(this.get_current_token(), "T_CONSTANT", err_list, list.get_ast_list_count() )){
-	
 						error_flag = true;
 						return null;
 
@@ -835,12 +715,89 @@ class parser{
 
 					node.add_function_arg(arg);
 
-				}else if( t.get_type().equals("T_IDENTIFIER") ){
+					//comma
 
 					this.get_next_token();
-	
-					if( !this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count() )){
-	
+
+					if (!this.eat(get_current_token(), "T_COMMA", err_list, list.get_ast_list_count())) {
+
+						error_flag = false;
+						return null;
+
+					}
+
+					//second arguement
+					t = peek_next_token();
+
+					if (t.get_type().equals("T_CONSTANT")) {
+
+						this.get_next_token();
+
+						if (!this.eat(this.get_current_token(), "T_CONSTANT", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
+
+						node.add_function_arg(arg);
+
+					} else if (t.get_type().equals("T_IDENTIFIER")) {
+
+						this.get_next_token();
+
+						if (!this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
+
+						node.add_function_arg(arg);
+
+					} else if (t.get_type().equals("T_KEYWORD")) {
+
+						this.get_next_token();
+
+						if (!this.eat(this.get_current_token(), "T_KEYWORD", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
+
+						node.add_function_arg(arg);
+
+					}
+
+					break;
+				}
+				case "input": {
+
+					node.set_function_name(get_current_token().get_content());
+
+					this.get_next_token(); //(
+
+
+					if (!this.eat(get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count())) {
+
+						error_flag = true;
+						return null;
+
+					}
+
+					//first arguement
+
+					this.get_next_token();
+
+					if (!this.eat(this.get_current_token(), "T_KEYWORD", err_list, list.get_ast_list_count())) {
+
 						error_flag = true;
 						return null;
 
@@ -850,14 +807,283 @@ class parser{
 
 					node.add_function_arg(arg);
 
+					break;
+				}
+				case "wait": {
+
+					node.set_function_name(get_current_token().get_content());
+
+					this.get_next_token(); //(
+
+
+					if (!this.eat(get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count())) {
+
+						error_flag = true;
+						return null;
+
+					}
+
+					//first arguement
+
+					token t = peek_next_token();
+
+					if (t.get_type().equals("T_CONSTANT")) {
+
+						this.get_next_token();
+
+						if (!this.eat(this.get_current_token(), "T_CONSTANT", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						function_arg arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
+
+						node.add_function_arg(arg);
+
+					} else if (t.get_type().equals("T_IDENTIFIER")) {
+
+						this.get_next_token();
+
+						if (!this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						function_arg arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
+
+						node.add_function_arg(arg);
+
+					}else{
+
+						err_list.add_new_error(new error("Expected constant", list.get_ast_list_count()));
+						return null;
+
+					}
+					break;
+				}
+				case "call":{
+
+
+					node.set_function_name(this.get_current_token().get_content());
+
+					this.get_next_token(); //(
+
+
+					if (!this.eat(get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count())) {
+
+						error_flag = true;
+						return null;
+
+					}
+
+					//first argument
+
+					token t = this.peek_next_token();
+
+					if( t.get_type().equals("T_STRING") ){
+
+						this.get_next_token(); //STRING
+
+						if (!this.eat(this.get_current_token(), "T_STRING", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						function_arg arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
+
+						node.add_function_arg(arg);
+
+
+					}else if( t.get_type().equals("T_IDENTIFIER") ){
+
+						this.get_next_token(); //IDENTIFIER
+
+						if (!this.eat(this.get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						function_arg arg = new function_arg(this.get_current_token().get_content(), this.get_current_token().get_type());
+
+						node.add_function_arg(arg);
+
+
+					}else{
+
+						err_list.add_new_error( new error("Expected String", list.get_ast_list_count()));
+
+					}
+
+					break;
+				}
+				case "message" : {
+
+					node.set_function_name(this.get_current_token().get_content());
+
+					this.get_next_token(); //(
+
+
+					if (!this.eat(get_current_token(), "T_LPAREN", err_list, list.get_ast_list_count())) {
+
+						error_flag = true;
+						return null;
+
+					}
+
+					//first argument
+
+					token t = this.peek_next_token();
+
+					if( t.get_type().equals("T_STRING")) {
+
+						this.get_next_token(); //STRING
+
+						if (!this.eat(get_current_token(), "T_STRING", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						node.add_function_arg(new function_arg( this.get_current_token().get_content(), this.get_current_token().get_type() ));
+
+						this.get_next_token(); // ,
+
+						if (!this.eat(get_current_token(), "T_COMMA", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						t = this.peek_next_token();
+
+						// STRING or IDENTIFIER
+
+						//second argument
+
+						Log.e(TAG, t.get_type() + ", " + t.get_content());
+
+						if( t.get_type().equals("T_STRING")){
+
+							this.get_next_token(); //STRING
+
+							if (!this.eat(get_current_token(), "T_STRING", err_list, list.get_ast_list_count())) {
+
+								error_flag = true;
+								return null;
+
+							}
+
+							node.add_function_arg(new function_arg( this.get_current_token().get_content(), this.get_current_token().get_type() ));
+
+						}else if( t.get_type().equals("T_IDENTIFIER") ){
+
+							this.get_next_token(); //IDENTIFIER
+
+							if (!this.eat(get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
+
+								return null;
+
+							}
+
+							node.add_function_arg(new function_arg( this.get_current_token().get_content(), this.get_current_token().get_type() ));
+
+						}else{
+
+							err_list.add_new_error(new error( "Expected String 2nd arg", list.get_ast_list_count()));
+							return null;
+
+						}
+
+					}else if( t.get_type().equals("T_IDENTIFIER")) {
+
+						this.get_next_token(); //IDENTIFIER
+
+						if (!this.eat(get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						node.add_function_arg(new function_arg( this.get_current_token().get_content(), this.get_current_token().get_type() ));
+
+						this.get_next_token(); // ,
+
+						if (!this.eat(get_current_token(), "T_COMMA", err_list, list.get_ast_list_count())) {
+
+							error_flag = true;
+							return null;
+
+						}
+
+						t = this.peek_next_token();
+
+						// STRING or IDENTIFIER
+
+						//second argument
+
+						if( t.get_type().equals("T_STRING")){
+
+							this.get_next_token(); //STRING
+
+							if (!this.eat(get_current_token(), "T_STRING", err_list, list.get_ast_list_count())) {
+
+								error_flag = true;
+								return null;
+
+							}
+
+							node.add_function_arg(new function_arg( this.get_current_token().get_content(), this.get_current_token().get_type() ));
+
+						}else if( t.get_type().equals("T_IDENTIFIER") ){
+
+							this.get_next_token(); //IDENTIFIER
+
+							if (!this.eat(get_current_token(), "T_IDENTIFIER", err_list, list.get_ast_list_count())) {
+
+								return null;
+
+							}
+
+							node.add_function_arg(new function_arg( this.get_current_token().get_content(), this.get_current_token().get_type() ));
+
+						}else{
+
+							err_list.add_new_error(new error( "Expected String 2nd arg", list.get_ast_list_count()));
+							return null;
+
+						}
+
+
+					}else{
+
+						err_list.add_new_error(new error( "Expected String 1st arg", list.get_ast_list_count()));
+						return null;
+
+					}
+
+					break;
+				}
+				case "json" : {
+
+					break;
 				}
 			}
 			
-			get_next_token();
+			get_next_token(); // )
 
 			if( !this.eat(get_current_token(), "T_RPAREN", err_list, list.get_ast_list_count()) ){
 
-				error_flag = true;
 				return null;
 
 			}

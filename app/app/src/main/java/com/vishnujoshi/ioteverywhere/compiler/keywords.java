@@ -44,6 +44,12 @@ class keywords{
 		"print",
 		"call",
 		"message",
+		"connectWifi",
+		"get",
+		"post",
+		"delete",
+		"put",
+		"json",
 	};
 
 	private static ArrayList<String> BUILTIN_FUNCTION_LIST = new ArrayList<String>(Arrays.asList(BUILTIN_FUNCTION));
