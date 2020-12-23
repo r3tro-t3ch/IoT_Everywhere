@@ -435,7 +435,7 @@ public class evaluator {
 
                                 s.setData_type("NUMBER");
 
-                                table.update_table(s);
+                                table.add_new_symbol(s);
 
                                 Log.e("sensor_val : ", s.getValue());
 

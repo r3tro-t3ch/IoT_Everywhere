@@ -13,6 +13,7 @@ public class compiler {
 	private ast_l ast_list;
 	private evaluator e;
 	private static String TAG = "compiler";
+	private Thread thread = null;
 
 	public Context getContext() {
 		return context;
@@ -55,7 +56,27 @@ public class compiler {
 
 		e = new evaluator(ast_list);
 		e.setContext(context);
-		e.run();
+
+		thread = new Thread() {
+			@Override
+			public void run() {
+
+				e.run();
+
+			}
+		};
+
+		thread.start();
+
+	}
+
+	public void stop(){
+
+		if( thread.isAlive() ){
+
+			thread.interrupt();
+
+		}
 
 	}
 

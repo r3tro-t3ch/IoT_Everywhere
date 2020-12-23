@@ -48,13 +48,25 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         //initializing sensor modules
         initSensor()
 
+        var c: compiler? = null
+
         binding.run.setOnClickListener{
 
             val code = binding.codeEditor.text.trim().toString()
 
-            val c = compiler(code + "\u0000")
-            c.context = applicationContext
-            c.compile()
+            c = compiler(code + "\u0000")
+            c!!.context = applicationContext
+            c!!.compile()
+
+        }
+
+        binding.stop.setOnClickListener {
+
+            if( c != null ){
+
+                c!!.stop()
+
+            }
 
         }
 
