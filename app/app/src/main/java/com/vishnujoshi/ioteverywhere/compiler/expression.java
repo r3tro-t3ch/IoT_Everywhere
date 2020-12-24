@@ -112,7 +112,8 @@ public class expression {
 
                 symbol s = table.search_symbol(t.get_content());
 
-                if(s.getData_type().equals("STRING")){
+                if( s != null && s.getData_type().equals("STRING")){
+
                     flag = true;
                     break;
                 }
@@ -196,6 +197,23 @@ public class expression {
                 if(this.is_valid_string_expr(token_list )){
                     STRING_FLAG = true;
                 }
+            }
+
+            if( token_list.get(0).get_type().equals("T_IDENTIFIER")){
+
+                symbol s = table.search_symbol(token_list.get(0).get_content());
+
+                if( s != null ){
+
+                    return s.getValue();
+
+                }else{
+
+                    err_list.add_new_error(new error("Variable " + token_list.get(0).get_content() + " is not declared", line));
+                    return null;
+
+                }
+
             }
 
             return token_list.get(0).get_content();

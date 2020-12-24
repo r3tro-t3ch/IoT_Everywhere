@@ -1230,37 +1230,76 @@ class parser{
 
 		token t = this.peek_next_token();
 
-		switch (t.get_type()){
+		if ("T_RPAREN".equals(t.get_type())) {
 
-			case "T_RPAREN":{
+			this.get_next_token(); // )
 
-				this.get_next_token(); // )
+			Stack<token> s = new Stack<>();
 
-				Stack<token> s =new Stack<>();
+			ast_l loop_code_block = this.parse_statement_block(err_list, s, list);
+
+			if (loop_code_block != null) {
+
+				if (loop_code_block.get_ast_list_count() == 0) {
+
+					err_list.add_new_error(new error("Empty loop block", list.get_ast_list_count()));
+					return null;
+
+				}
+
+				node.setLoop_code_block(loop_code_block);
+
+			} else {
+
+				return null;
+
+			}
+		} else {
+
+			expression e = new expression();
+
+			if (e.is_expression_token(t)) {
+
+				ArrayList<token> expr = this.parse_condtional_expression();
+
+				if (!e.is_postfix_valid(expr)) {
+
+					err_list.add_new_error(new error("Invalid expression", list.get_ast_list_count()));
+					return null;
+
+				}
+
+				node.setLoop_statement_expr(expr);
+
+				Stack<token> s = new Stack<>();
 
 				ast_l loop_code_block = this.parse_statement_block(err_list, s, list);
 
-				if( loop_code_block != null ) {
+				if (loop_code_block != null) {
 
-					if( loop_code_block.get_ast_list_count() == 0){
+					if (loop_code_block.get_ast_list_count() == 0) {
 
-						err_list.add_new_error( new error("Empty loop block", list.get_ast_list_count()));
+						err_list.add_new_error(new error("Empty loop block", list.get_ast_list_count()));
 						return null;
 
 					}
 
 					node.setLoop_code_block(loop_code_block);
 
-				}else{
+				} else {
 
-					return	null;
+					return null;
 
 				}
 
+				node.set_type("AST_LOOP_CONDITIONAL");
+
+
+
 			}
-
-
 		}
+
+		node.set_ast_node_index(list.get_ast_list_count());
 
 		return node;
 
@@ -1408,6 +1447,7 @@ class parser{
 
 		while( !this.get_current_token().get_type().equals("T_NULL") ){
 
+
 			if( this.get_current_token().get_type().equals("T_KEYWORD") ){
 
 				if( this.get_current_token().get_content().equals("var")){
@@ -1548,6 +1588,16 @@ class parser{
 					ast node = this.parse_conditional_statements(err_list, ast_list);
 
 					if( node != null ){
+
+						ast_list.add_new_ast(node);
+
+					}
+
+				}else if( this.get_current_token().get_content().equals("loop")){
+
+					ast node = this.parse_looping_statements(err_list, ast_list);
+
+					if( node != null){
 
 						ast_list.add_new_ast(node);
 

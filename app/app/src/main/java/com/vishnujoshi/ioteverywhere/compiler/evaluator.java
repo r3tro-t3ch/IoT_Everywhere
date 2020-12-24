@@ -119,6 +119,11 @@ public class evaluator {
 
                             table.add_new_symbol(s);
 
+                        }else{
+
+                            err_list.print_errors();
+                            return;
+
                         }
 
                     } else {
@@ -154,6 +159,11 @@ public class evaluator {
                                 table.add_new_symbol(s);
 
                                 Log.e("sensor_val : ", s.getValue());
+
+                            }else{
+
+                                err_list.print_errors();
+                                return;
 
                             }
 
@@ -203,6 +213,11 @@ public class evaluator {
 
                             }
 
+                        }else{
+
+                            err_list.print_errors();
+                            return;
+
                         }
 
                     } else {
@@ -235,6 +250,11 @@ public class evaluator {
                                 table.update_table(s);
 
                                 Log.e("sensor_val : ", s.getValue());
+
+                            }else{
+
+                                err_list.print_errors();
+                                return;
 
                             }
 
@@ -323,6 +343,31 @@ public class evaluator {
 
                 }
 
+                case "AST_LOOP_CONDITIONAL":{
+
+                    expression e = new expression();
+
+                    String answer = e.evaluate_expression(temp_ast.getLoop_statement_expr(), err_list, table, temp_ast.get_ast_node_index());
+
+                    if( answer != null && !e.getSTRING_FLAG()) {
+
+                        for (int i = 0; i < Integer.parseInt(answer); i++) {
+
+                            this.run_block(table, temp_ast.getLoop_code_block(), err_list);
+
+                        }
+
+                    }else{
+
+                        err_list.print_errors();
+                        return;
+
+                    }
+
+                    break;
+
+                }
+
             }
 
         }
@@ -403,6 +448,11 @@ public class evaluator {
 
                             table.add_new_symbol(s);
 
+                        }else{
+
+                            err_list.print_errors();
+                            return;
+
                         }
 
                     }else {
@@ -441,6 +491,11 @@ public class evaluator {
                                 table.add_new_symbol(s);
 
                                 Log.e("sensor_val : ", s.getValue());
+
+                            }else{
+
+                                err_list.print_errors();
+                                return;
 
                             }
 
@@ -492,13 +547,18 @@ public class evaluator {
 
                             }
 
+                        }else{
+
+                            err_list.print_errors();
+                            return;
+
                         }
 
                     }else if(parent_s != null && s == null ){
 
                         ArrayList<token> list = temp_ast.getVar_expr();
 
-                        String answer = e.evaluate_expression(list, err_list, table, temp_ast.get_ast_node_index());
+                        String answer = e.evaluate_expression(list, err_list, parent_symbol_table, temp_ast.get_ast_node_index());
 
                         if (answer != null) {
 
@@ -559,6 +619,11 @@ public class evaluator {
                                 table.update_table(s);
 
                                 Log.e("sensor_val : ", s.getValue());
+
+                            }else{
+
+                                err_list.print_errors();
+                                return;
 
                             }
 
@@ -702,6 +767,66 @@ public class evaluator {
                     break;
 
                 }
+
+                case "AST_LOOP_INFINITE" : {
+
+                    symbol_table temp_table = new symbol_table();
+
+                    if( parent_symbol_table != null){
+
+                        temp_table.getTable().addAll(parent_symbol_table.getTable());
+                        temp_table.getTable().addAll(table.getTable());
+
+                    }else{
+
+                        temp_table.getTable().addAll(table.getTable());
+
+                    }
+
+                    while (true) {
+                        this.run_block(temp_table, temp_ast.getLoop_code_block(), err_list);
+                    }
+
+                }
+
+                case "AST_LOOP_CONDITIONAL":{
+
+                    symbol_table temp_table = new symbol_table();
+
+                    if( parent_symbol_table != null){
+
+                        temp_table.getTable().addAll(parent_symbol_table.getTable());
+                        temp_table.getTable().addAll(table.getTable());
+
+                    }else{
+
+                        temp_table.getTable().addAll(table.getTable());
+
+                    }
+
+                    expression e = new expression();
+
+                    String answer = e.evaluate_expression(temp_ast.getLoop_statement_expr(), err_list, temp_table, temp_ast.get_ast_node_index());
+                    
+                    if( answer != null && !e.getSTRING_FLAG()) {
+
+                        for (int i = 0; i < Integer.parseInt(answer); i++) {
+
+                            this.run_block(temp_table, temp_ast.getLoop_code_block(), err_list);
+
+                        }
+
+                    }else{
+
+                        err_list.print_errors();
+                        return;
+
+                    }
+
+                    break;
+
+                }
+
             }
 
 
