@@ -2,6 +2,7 @@ package com.vishnujoshi.ioteverywhere
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -10,10 +11,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
 import android.view.View
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 import com.vishnujoshi.ioteverywhere.compiler.compiler
 import com.vishnujoshi.ioteverywhere.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
@@ -32,9 +36,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var HUMIDITY : Sensor ? = null
     private var AIR_PRESSURE : Sensor ? = null
 
+    //permissions
+    private val PERMISSIONS = arrayOf(android.Manifest.permission.CALL_PHONE, android.Manifest.permission.SEND_SMS);
+    private val PERMISSION_CODE = 1;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        checkPermissions();
 
         //setting Activity binder
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -210,6 +220,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
         editor.commit()
+
+    }
+
+    private fun checkPermissions(){
+
+        ActivityCompat.requestPermissions(this@MainActivity, PERMISSIONS, PERMISSION_CODE);
 
     }
 

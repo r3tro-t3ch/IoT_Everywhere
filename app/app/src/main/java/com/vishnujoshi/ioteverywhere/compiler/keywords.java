@@ -3,6 +3,7 @@ package com.vishnujoshi.ioteverywhere.compiler;
 
 
 import java.util.*;
+import java.util.function.DoubleUnaryOperator;
 
 class keywords{
 
@@ -100,6 +101,18 @@ class keywords{
 	        return false;
 	    }
 	    return true;
+	}
+
+	public static boolean is_numeric(String str) {
+		if (str == null) {
+			return false;
+		}
+		try {
+			Double d = Double.parseDouble(str);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
 	}
 
 	public boolean is_float(String str) {

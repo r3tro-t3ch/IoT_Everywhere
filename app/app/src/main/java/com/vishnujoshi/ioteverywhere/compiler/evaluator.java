@@ -2,6 +2,7 @@ package com.vishnujoshi.ioteverywhere.compiler;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.hardware.Sensor;
@@ -10,7 +11,9 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.net.Uri;
 import android.os.Build;
+import android.telephony.SmsManager;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -743,29 +746,217 @@ public class evaluator {
 
                 case "call":
 
-                    this.evaluate_call_function_call(temp_ast);
+                    this.evaluate_call_function_call(temp_ast, table, err_list);
 
                     break;
                 case "message":
 
-                    this.evaluate_message_function_call(temp_ast);
+                    this.evaluate_message_function_call(temp_ast, table, err_list);
             }
 
         }
 
     }
 
-    private void evaluate_call_function_call(ast temp_ast){
+    private void evaluate_call_function_call(ast temp_ast, symbol_table table, errors err_list){
 
         Log.e(TAG, temp_ast.get_function_name());
         Log.e(TAG, "args : " + temp_ast.get_args_list().get(0).get_arg_name());
 
+        function_arg arg = temp_ast.get_args_list().get(0);
+
+        switch (arg.get_arg_type()){
+
+            case "T_IDENTIFIER" : {
+
+                symbol s = table.search_symbol(arg.get_arg_name());
+
+                if( s != null ){
+
+                    if(s.getData_type().equals("STRING")){
+
+                        if( keywords.is_numeric(s.getValue()) ){
+
+                            Intent intent = new Intent(Intent.ACTION_CALL);
+                            intent.setData(Uri.parse("tel:" + s.getValue()));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(intent);
+
+                        }else{
+
+                            err_list.add_new_error(new error("Variable " + s.getName() + " should have phone number as a string value", temp_ast.get_ast_node_index()));
+                            err_list.print_errors();
+                            return;
+
+                        }
+
+                    }else{
+
+                        err_list.add_new_error(new error("Variable " + s.getName() + " is not String", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+                    }
+
+                }else{
+
+                    err_list.add_new_error(new error("Variable " + arg.get_arg_name() + " not present", temp_ast.get_ast_node_index()));
+                    err_list.print_errors();
+                    return;
+
+                }
+
+                break;
+
+            }
+            case "T_STRING" : {
+
+                if( keywords.is_numeric(arg.get_arg_name()) ){
+
+                    Intent intent = new Intent(Intent.ACTION_CALL);
+                    intent.setData(Uri.parse("tel:" + arg.get_arg_name()));
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+
+                }else{
+
+                    err_list.add_new_error(new error("Symbol " + arg.get_arg_name() + " should have phone number as a string value", temp_ast.get_ast_node_index()));
+                    err_list.print_errors();
+                    return;
+
+                }
+
+                break;
+
+            }
+
+        }
+
     }
 
-    private void evaluate_message_function_call(ast temp_ast){
+    private void evaluate_message_function_call(ast temp_ast, symbol_table table, errors err_list){
 
         Log.e(TAG, temp_ast.get_function_name());
         Log.e(TAG, "args : " + temp_ast.get_args_list().get(0).get_arg_name() + ", " + temp_ast.get_args_list().get(1).get_arg_name());
+
+        function_arg arg1 = temp_ast.get_args_list().get(0);
+        function_arg arg2 = temp_ast.get_args_list().get(1);
+
+        switch ( arg1.get_arg_type()){
+
+            case "T_IDENTIFIER": {
+
+                symbol s = table.search_symbol(arg1.get_arg_name());
+
+                if( s != null ) {
+
+                    if (s.getData_type().equals("STRING")) {
+
+                        if (keywords.is_numeric(s.getValue())) {
+
+                            switch (arg2.get_arg_type()) {
+
+                                case "T_IDENTIFIER": {
+
+                                    symbol s2 = table.search_symbol(arg2.get_arg_name());
+
+                                    if (s2 != null) {
+
+                                        SmsManager smsManager = SmsManager.getDefault();
+                                        smsManager.sendTextMessage(s.getValue(), null, s2.getValue(), null, null);
+
+                                    }else{
+
+                                        err_list.add_new_error(new error("Variable " + arg2.get_arg_name() + " is not present", temp_ast.get_ast_node_index()));
+                                        err_list.print_errors();
+                                        return;
+
+                                    }
+
+                                    break;
+
+                                }
+                                case "T_STRING": {
+
+                                    SmsManager smsManager = SmsManager.getDefault();
+                                    smsManager.sendTextMessage(s.getValue(), null, arg2.get_arg_name(), null, null);
+                                    break;
+
+                                }
+
+                            }
+
+                        } else {
+
+                            err_list.add_new_error(new error("Variable " + s.getName() + " should have phone number as a string value", temp_ast.get_ast_node_index()));
+                            err_list.print_errors();
+                            return;
+
+                        }
+
+                    } else {
+
+                        err_list.add_new_error(new error("Variable " + s.getName() + " is not String", temp_ast.get_ast_node_index()));
+                        err_list.print_errors();
+                        return;
+
+                    }
+                }
+
+                break;
+            }
+            case "T_STRING":{
+
+                if( keywords.is_numeric(arg1.get_arg_name())) {
+
+                    switch (arg2.get_arg_type()) {
+
+                        case "T_IDENTIFIER": {
+
+                            symbol s = table.search_symbol(arg2.get_arg_name());
+
+                            if (s != null) {
+
+                                Log.e(TAG, s.getValue());
+
+                                SmsManager smsManager = SmsManager.getDefault();
+                                smsManager.sendTextMessage(arg1.get_arg_name(), null, s.getValue(), null, null);
+
+                            }else{
+
+                                err_list.add_new_error(new error("Variable " + arg2.get_arg_name() + " is not present", temp_ast.get_ast_node_index()));
+                                err_list.print_errors();
+                                return;
+
+                            }
+
+                            break;
+
+                        }
+                        case "T_STRING": {
+
+                            SmsManager smsManager = SmsManager.getDefault();
+                            smsManager.sendTextMessage(arg1.get_arg_name(), null, arg2.get_arg_name(), null, null);
+                            break;
+
+                        }
+
+                    }
+
+                }else{
+
+                    err_list.add_new_error(new error("Symbol " + arg1.get_arg_name() + " should have phone number as a string value", temp_ast.get_ast_node_index()));
+                    err_list.print_errors();
+                    return;
+
+                }
+
+                break;
+
+            }
+
+
+        }
 
     }
 
