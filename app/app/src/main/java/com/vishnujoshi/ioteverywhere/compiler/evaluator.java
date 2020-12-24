@@ -457,7 +457,7 @@ public class evaluator {
                 case "AST_VAR_ASSIGNMENT": {
 
                     symbol s = table.search_symbol(temp_ast.get_var_name());
-                    symbol parent_s = table.search_symbol(temp_ast.get_var_name());
+                    symbol parent_s = parent_symbol_table.search_symbol(temp_ast.get_var_name());
 
                     expression e = new expression();
 
