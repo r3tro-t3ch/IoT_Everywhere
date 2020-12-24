@@ -95,34 +95,41 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         val s = event!!.sensor
 
-        if(s.type == Sensor.TYPE_PROXIMITY){
+        when (s.type) {
+            Sensor.TYPE_PROXIMITY -> {
 
-            editor.putString("LIGHT", event!!.values[0].toString())
+                editor.putString("LIGHT", event!!.values[0].toString())
 
-        }else if(s.type == Sensor.TYPE_AMBIENT_TEMPERATURE){
+            }
+            Sensor.TYPE_AMBIENT_TEMPERATURE -> {
 
-            editor.putString("TEMPERATURE", event!!.values[0].toString())
+                editor.putString("TEMPERATURE", event!!.values[0].toString())
 
-        }else if(s.type == Sensor.TYPE_GYROSCOPE){
+            }
+            Sensor.TYPE_GYROSCOPE -> {
 
-            editor.putString("GYROSCOPEX", event!!.values[0].toString())
-            editor.putString("GYROSCOPEY", event!!.values[1].toString())
-            editor.putString("GYROSCOPEZ", event!!.values[2].toString())
+                editor.putString("GYROSCOPEX", event!!.values[0].toString())
+                editor.putString("GYROSCOPEY", event!!.values[1].toString())
+                editor.putString("GYROSCOPEZ", event!!.values[2].toString())
 
-        }else if(s.type == Sensor.TYPE_ACCELEROMETER){
+            }
+            Sensor.TYPE_ACCELEROMETER -> {
 
-            editor.putString("ACCELEROMETERX", event!!.values[0].toString())
-            editor.putString("ACCELEROMETERY", event!!.values[0].toString())
-            editor.putString("ACCELEROMETERZ", event!!.values[0].toString())
+                editor.putString("ACCELEROMETERX", event!!.values[0].toString())
+                editor.putString("ACCELEROMETERY", event!!.values[1].toString())
+                editor.putString("ACCELEROMETERZ", event!!.values[2].toString())
 
-        }else if(s.type == Sensor.TYPE_RELATIVE_HUMIDITY){
+            }
+            Sensor.TYPE_RELATIVE_HUMIDITY -> {
 
-            editor.putString("HUMIDITY", event!!.values[0].toString())
+                editor.putString("HUMIDITY", event!!.values[0].toString())
 
-        }else if(s.type == Sensor.TYPE_PRESSURE){
+            }
+            Sensor.TYPE_PRESSURE -> {
 
-            editor.putString("AIRPRESSURE", event!!.values[0].toString())
+                editor.putString("AIRPRESSURE", event!!.values[0].toString())
 
+            }
         }
 
 
