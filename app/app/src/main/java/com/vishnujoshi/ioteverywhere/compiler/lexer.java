@@ -1,4 +1,7 @@
-import java.util.regex.*; 
+package com.vishnujoshi.ioteverywhere.compiler;
+
+
+import java.util.regex.*;
 import java.util.*;
 
 class lexer{
@@ -32,7 +35,13 @@ class lexer{
 		this.index++;
 		this.current_char = this.code[this.index];
 	
-	} 
+	}
+
+	public char peek_next_char(){
+
+		return this.code[index+1];
+
+	}
 
 	public String get_string(){
 
@@ -63,7 +72,7 @@ class lexer{
 		ArrayList<Character> identifier = new ArrayList<Character>();
 		identifier.add(this.current_char);
 		this.next_char();
-		while( is_alpha_numeric( this.current_char )){
+		while( is_alpha_numeric( this.current_char ) || this.current_char == '.'){
 
 			identifier.add(this.current_char);
 			this.next_char();

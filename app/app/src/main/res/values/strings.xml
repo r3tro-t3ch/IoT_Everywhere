@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">IoT Everywhere</string>
+    <string name="editor">Editor</string>
 </resources>

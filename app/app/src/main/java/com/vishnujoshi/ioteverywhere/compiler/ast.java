@@ -1,3 +1,6 @@
+package com.vishnujoshi.ioteverywhere.compiler;
+
+
 import java.util.*;
 
 class ast{
@@ -9,15 +12,26 @@ class ast{
 	//funciton call
 	private String function_name;
 	private ArrayList<function_arg> args_list;
-
+	private String function_return_value;
 
 	//variable definition and assignment
 	private String var_def_var_name;
 	private String var_def_var_content;
+	private ArrayList<token> var_def_var_expr;
 
 	//variable
 	private String var_name;
 	private String var_content;
+	private ArrayList<token> var_expr;
+
+	//conditonal statements
+	private ArrayList<token> conditional_statement_expr;
+	private ast_l true_block;
+	private ast_l false_block;
+
+	//looping statements
+	private ArrayList<token> loop_statement_expr;
+	private ast_l loop_code_block;
 
 	//constructor
 	public ast(String type){
@@ -30,6 +44,22 @@ class ast{
 	
 	//getters and setters
 	//type
+	public ArrayList<token> getLoop_statement_expr() {
+		return loop_statement_expr;
+	}
+
+	public void setLoop_statement_expr(ArrayList<token> loop_statement_expr) {
+		this.loop_statement_expr = loop_statement_expr;
+	}
+
+	public ast_l getLoop_code_block() {
+		return loop_code_block;
+	}
+
+	public void setLoop_code_block(ast_l loop_code_block) {
+		this.loop_code_block = loop_code_block;
+	}
+
 	public String get_type(){
 		return this.type;
 	}
@@ -60,8 +90,20 @@ class ast{
 		return this.args_list;
 	}
 
+	public void set_args_list(ArrayList<function_arg> args_list) {
+		this.args_list = args_list;
+	}
+
 	public void add_function_arg(function_arg arg){
 		this.args_list.add(arg);
+	}
+
+	public String getFunction_return_value() {
+		return function_return_value;
+	}
+
+	public void setFunction_return_value(String function_return_value) {
+		this.function_return_value = function_return_value;
 	}
 
 	//function call args count
@@ -104,12 +146,55 @@ class ast{
 	public void set_var_content(String content){
 		this.var_content = content;
 	}
-	
+
+	public ArrayList<token> getVar_def_var_expr() {
+		return var_def_var_expr;
+	}
+
+	public void setVar_def_var_expr(ArrayList<token> var_def_var_expr) {
+		this.var_def_var_expr = var_def_var_expr;
+	}
+
+	public ArrayList<token> getVar_expr() {
+		return var_expr;
+	}
+
+	public void setVar_expr(ArrayList<token> var_expr) {
+		this.var_expr = var_expr;
+	}
+
+	public ArrayList<token> getConditional_statement_expr() {
+		return conditional_statement_expr;
+	}
+
+	public void setConditional_statement_expr(ArrayList<token> conditional_statement_expr) {
+		this.conditional_statement_expr = conditional_statement_expr;
+	}
+
+	public ast_l getTrue_block() {
+		return true_block;
+	}
+
+	public void setTrue_block(ast_l true_block) {
+		this.true_block = true_block;
+	}
+
+	public ast_l getFalse_block() {
+		return false_block;
+	}
+
+	public void setFalse_block(ast_l false_block) {
+		this.false_block = false_block;
+	}
 }
 
 class ast_l{
 
 	private ArrayList<ast> ast_list;
+
+	public ArrayList<ast> getAst_list() {
+		return ast_list;
+	}
 
 	//constructor
 	public ast_l(){
